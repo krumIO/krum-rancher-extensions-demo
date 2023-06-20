@@ -6,7 +6,7 @@ export function init($plugin: IPlugin, store: any) {
   const { product } = $plugin.DSL(store, YOUR_PRODUCT_NAME);
 
   product({
-    icon:    'gear',
+    icon:    'apps',
     inStore: 'management',
     weight:  100
   });
