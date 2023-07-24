@@ -9,6 +9,5 @@ export default function(plugin: IPlugin) {
   // Provide plugin metadata from package.json
   plugin.metadata = require('./package.json');
 
-  // Load a product
-  // plugin.addProduct(require('./product'));
+  plugin.addLocale('en-pirate', 'EN Pirate');
 }

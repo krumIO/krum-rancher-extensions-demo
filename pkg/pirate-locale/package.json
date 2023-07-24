@@ -1,6 +1,6 @@
 {
-  "name": "pirate-speak",
-  "description": "pirate-speak plugin",
+  "name": "pirate-locale",
+  "description": "pirate-locale plugin",
   "version": "0.1.0",
   "private": false,
   "rancher": true,
