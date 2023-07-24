@@ -62,6 +62,15 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
+# Yarn (no zero-install)
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 # dotenv environment variables file
 .env
 
