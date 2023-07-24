@@ -12,15 +12,15 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-07-24T19:17:42.505448852Z"
+    created: "2023-07-24T19:37:17.482927202Z"
     description: app-launcher plugin
-    digest: 894e05775df184974e9ddfa81c76eac4069d168142b614add53f6cfdde8e628e
+    digest: a80f73ad054c930471b8c4294fea2302f746a6d1e86861dc96fc5c793012d71c
     name: app-launcher
     type: application
     urls:
     - assets/app-launcher/app-launcher-0.1.0.tgz
     version: 0.1.0
-  pirate-speak:
+  pirate-locale:
   - annotations:
       catalog.cattle.io/certified: rancher
       catalog.cattle.io/kube-version: '>= 1.16.0-0 < 1.28.0-0'
@@ -32,12 +32,12 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-07-24T19:17:42.505783353Z"
-    description: pirate-speak plugin
-    digest: 2e825e71332c3b3cf039fc31879e924fe1daed4700d65b5d616452e73ae42685
-    name: pirate-speak
+    created: "2023-07-24T19:37:17.483325642Z"
+    description: pirate-locale plugin
+    digest: 8cadf0c7d13b8bf3615e7c83e2cbfc031e9ab05b007d38b87e63557de7bbc07d
+    name: pirate-locale
     type: application
     urls:
-    - assets/pirate-speak/pirate-speak-0.1.0.tgz
+    - assets/pirate-locale/pirate-locale-0.1.0.tgz
     version: 0.1.0
-generated: "2023-07-24T19:17:42.504539051Z"
+generated: "2023-07-24T19:37:17.481052213Z"
