@@ -1,0 +1,3 @@
+plugin/package.json
+plugin/pirate-speak-0.1.0.umd.min.js
+plugin/pirate-speak-0.1.0.umd.min.js.map
