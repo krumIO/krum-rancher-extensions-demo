@@ -43,19 +43,13 @@ jobs:
         with:
           yq-version: v4.28.2
 
-      - name: Setup Nodejs and npm
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
-      - name: Setup yarn
-        run: npm install -g yarn
+      - run: corepack enable
 
       - name: Setup Nodejs with yarn caching
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
           cache: yarn
+          node-version-file: package.json
 
       - name: Install dependencies
         run: yarn
