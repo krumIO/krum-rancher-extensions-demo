@@ -1,2 +1,8 @@
 product:
   app-launcher: App Launcher
+
+appLauncher:
+  launch: Launch
+  launchEndpoint: Launch {endpoint}
+  launchAnEndpointFromSelection: Select an endpoint to launch
+  noEndpointFoundForApp: No endpoint found for app

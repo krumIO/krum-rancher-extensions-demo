@@ -34,7 +34,7 @@ module.exports = {
     'wrap-iife': 'off',
 
     'array-bracket-spacing': 'warn',
-    'arrow-parens': 'warn',
+    'arrow-parens': 'off',
     'arrow-spacing': ['warn', { before: true, after: true }],
     'block-spacing': ['warn', 'always'],
     'brace-style': ['warn', '1tbs'],
@@ -44,7 +44,6 @@ module.exports = {
     eqeqeq: 'warn',
     'func-call-spacing': ['warn', 'never'],
     'implicit-arrow-linebreak': 'warn',
-    indent: ['warn', 2],
     'keyword-spacing': 'warn',
     'lines-between-class-members': [
       'warn',
@@ -123,6 +122,8 @@ module.exports = {
     // incompatible with prettier
     'key-spacing': 'off',
     'object-curly-newline': 'off',
+    indent: 'off',
+    'vue/html-indent': 'off',
 
     // FIXME: The following is disabled due to new linter and old JS code. These should all be enabled and underlying issues fixed
     'vue/order-in-components': 'off',
