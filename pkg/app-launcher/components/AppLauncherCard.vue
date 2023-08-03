@@ -1,90 +1,82 @@
-<script>
+<script lang="ts" setup>
 import { Card } from '@components/Card';
 import ButtonDropDown from '@shell/components/ButtonDropdown';
+import { computed } from 'vue';
 
+const props = defineProps<{
+  service: {
+    metadata: {
+      labels?: {
+        /**
+         * Helm chart name that created this app (if relevant).
+         */
+        'helm.sh/chart'?: string;
+        /**
+         * The component of the app.
+         *
+         * See `app.kubernetes.io/component` from:
+         * https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+         */
+        'app.kubernetes.io/component'?: string;
+        /**
+         * The version of the app.
+         *
+         * See `app.kubernetes.io/version` from:
+         * https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+         */
+        'app.kubernetes.io/version'?: string;
+      };
+      /**
+       * The name of the app.
+       *
+       * See `app.kubernetes.io/name` from:
+       * https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
+       */
+      name: string;
+      /**
+       * The namespace of the app.
+       */
+      namespace: string;
+    };
+  };
+}>();
+
+// TODO(cjshearer): create the actual endpoints for the service.
+const endpoints = computed(() =>
+  Array.from(Array(Math.floor(Math.random() * 4))).map((_, i) => ({
+    label: `http://localhost:8005/some-long-text-that-might-be-unpleasant${i}`,
+    value: `http://localhost:8005/some-long-text-that-might-be-unpleasant${i}`,
+  }))
+);
+
+const computedServiceName = computed(() => {
+  if (props.service.metadata.labels?.['app.kubernetes.io/component']) {
+    return props.service.metadata.labels['app.kubernetes.io/component'];
+  }
+
+  return props.service.metadata.name;
+});
+
+const helmChart = computed(
+  () => props.service.metadata.labels?.['helm.sh/chart']
+);
+
+const kubernetesVersion = computed(
+  () => props.service.metadata.labels?.['app.kubernetes.io/version']
+);
+
+const name = computed(() => props.service.metadata.name);
+
+const namespace = computed(() => props.service.metadata.namespace);
+
+const openLink = (link: string) => {
+  location.href = link;
+};
+</script>
+
+<script lang="ts">
 export default {
-  name: 'AppLauncherCard',
-  props: {
-    /**
-     * Data used to construct endpoints for the app.
-     */
-    endpointsSource: {
-      type: Array,
-      default: () => [],
-    },
-    /**
-     * Helm chart name.
-     */
-    helmChart: {
-      type: String,
-      default: undefined,
-    },
-    /**
-     * The component of the app.
-     *
-     * See `app.kubernetes.io/component` from:
-     * https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
-     */
-    kubernetesComponent: {
-      type: String,
-      default: undefined,
-    },
-    /**
-     * The name of the app.
-     *
-     * See `app.kubernetes.io/name` from:
-     * https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
-     */
-    kubernetesName: {
-      type: String,
-      default: undefined,
-    },
-    /**
-     * The version of the app.
-     *
-     * See `app.kubernetes.io/version` from:
-     * https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
-     */
-    kubernetesVersion: {
-      type: String,
-      default: undefined,
-    },
-    /**
-     * The name of the app.
-     */
-    name: {
-      type: String,
-      default: undefined,
-    },
-    /**
-     * The namespace of the app.
-     */
-    namespace: {
-      type: String,
-      default: undefined,
-    },
-  },
-  components: { ButtonDropDown, Card },
-  computed: {
-    endpoints() {
-      return this.endpointsSource.map((_, i) => ({
-        label: `http://localhost:8005/some-long-text-that-might-be-unpleasant${i}`,
-        value: `http://localhost:8005/some-long-text-that-might-be-unpleasant${i}`,
-      }));
-    },
-    computedServiceName() {
-      if (this.kubernetesComponent) {
-        return this.kubernetesComponent;
-      }
-
-      return this.name;
-    },
-  },
-  methods: {
-    openLink(link) {
-      location.href = link;
-    },
-  },
+  layout: 'plain',
 };
 </script>
 

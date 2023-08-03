@@ -1,62 +1,55 @@
-<script>
+<script lang="ts" setup>
+import { ref, onMounted, getCurrentInstance } from 'vue';
 import Loading from '@shell/components/Loading';
 import { MANAGEMENT } from '@shell/config/types';
 import AppLauncherCard from '../components/AppLauncherCard.vue';
 
-export default {
-  layout: 'plain',
-  components: { AppLauncherCard, Loading },
-  async fetch() {
-    const allClusters = await this.$store.dispatch(`management/findAll`, {
-      type: MANAGEMENT.CLUSTER,
-    });
+const store = getCurrentInstance()?.proxy.$store;
 
-    this.servicesByCluster = await Promise.all(
+const servicesByCluster = ref<
+  { clusterText: string; services: { id: string }[] }[]
+>([]);
+
+const fetchServicesByCluster = async () => {
+  const allClusters = await store.dispatch(`management/findAll`, {
+    type: MANAGEMENT.CLUSTER,
+  });
+
+  servicesByCluster.value = (
+    await Promise.all(
       allClusters
         .filter((c) => c.isReady)
         .map(async (c) => [
           c.spec.displayName,
           (
-            await this.$store.dispatch('cluster/request', {
+            await store.dispatch('cluster/request', {
               url: `/k8s/clusters/${c.id}/v1/services`,
             })
           ).data,
         ])
-    );
-  },
-  computed: {
-    appCardData() {
-      const clusterTranslation =
-        this.$store.getters['i18n/t']('nav.group.cluster');
+    )
+  ).map(([cluster, services]) => ({
+    clusterText: `${store.getters['i18n/t']('nav.group.cluster')} ${cluster}`,
+    services,
+  }));
+};
 
-      return this.servicesByCluster.map(([cluster, services]) => ({
-        clusterText: `${clusterTranslation} ${cluster}`,
-        services: services.map((service) => ({
-          helmChart: service.metadata.labels?.['helm.sh/chart'],
-          kubernetesComponent:
-            service.metadata.labels?.['app.kubernetes.io/component'],
-          kubernetesName: service.metadata.labels?.['app.kubernetes.io/name'],
-          kubernetesVersion:
-            service.metadata.labels?.['app.kubernetes.io/version'],
-          name: service.metadata.name,
-          namespace: service.metadata.namespace,
-        })),
-      }));
-    },
-  },
-  data() {
-    return {
-      servicesByCluster: [],
-    };
-  },
+onMounted(() => {
+  fetchServicesByCluster();
+});
+</script>
+
+<script lang="ts">
+export default {
+  layout: 'plain',
 };
 </script>
 
 <template>
-  <Loading v-if="$fetchState.pending" />
+  <Loading v-if="Boolean(false)" />
   <div v-else>
     <div
-      v-for="cluster in appCardData"
+      v-for="cluster in servicesByCluster"
       :key="cluster.clusterText"
       style="margin-bottom: 2rem"
     >
@@ -67,14 +60,7 @@ export default {
         <AppLauncherCard
           v-for="service in cluster.services"
           :key="service.id"
-          :endpoints-source="Array.from(Array(Math.floor(Math.random() * 4)))"
-          :helm-chart="service.helmChart"
-          :kubernetes-component="service.kubernetesComponent"
-          :kubernetes-instance="service.kubernetesInstance"
-          :kubernetes-name="service.kubernetesName"
-          :kubernetes-version="service.kubernetesVersion"
-          :name="service.name"
-          :namespace="service.namespace"
+          :service="service"
         />
       </div>
     </div>
