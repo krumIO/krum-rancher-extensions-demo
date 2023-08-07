@@ -1,13 +1,14 @@
 <script lang="ts" setup>
+import { MANAGEMENT } from '@shell/config/types';
 import { ref, onMounted, getCurrentInstance } from 'vue';
 import Loading from '@shell/components/Loading';
-import { MANAGEMENT } from '@shell/config/types';
 import AppLauncherCard from '../components/AppLauncherCard.vue';
+import type { AppLauncherService } from '../components/AppLauncherCard.vue';
 
 const store = getCurrentInstance()?.proxy.$store;
 
 const servicesByCluster = ref<
-  { clusterText: string; services: { id: string }[] }[]
+  { id: string; name: string; services: AppLauncherService[] }[]
 >([]);
 
 const fetchServicesByCluster = async () => {
@@ -15,23 +16,21 @@ const fetchServicesByCluster = async () => {
     type: MANAGEMENT.CLUSTER,
   });
 
-  servicesByCluster.value = (
-    await Promise.all(
-      allClusters
-        .filter((c) => c.isReady)
-        .map(async (c) => [
-          c.spec.displayName,
-          (
-            await store.dispatch('cluster/request', {
-              url: `/k8s/clusters/${c.id}/v1/services`,
-            })
-          ).data,
-        ])
-    )
-  ).map(([cluster, services]) => ({
-    clusterText: `${store.getters['i18n/t']('nav.group.cluster')} ${cluster}`,
-    services,
-  }));
+  servicesByCluster.value = await Promise.all(
+    allClusters
+      .filter((cluster) => cluster.isReady)
+      .map(async (cluster) => ({
+        name: `${store.getters['i18n/t']('nav.group.cluster')} ${
+          cluster.spec.displayName
+        }`,
+        id: cluster.id,
+        services: (
+          await store.dispatch('cluster/request', {
+            url: `/k8s/clusters/${cluster.id}/v1/services`,
+          })
+        ).data,
+      }))
+  );
 };
 
 onMounted(() => {
@@ -50,16 +49,17 @@ export default {
   <div v-else>
     <div
       v-for="cluster in servicesByCluster"
-      :key="cluster.clusterText"
+      :key="cluster.id"
       style="margin-bottom: 2rem"
     >
       <h1 class="cluster-header">
-        {{ cluster.clusterText }}
+        {{ cluster.name }}
       </h1>
       <div class="services-by-cluster-grid">
         <AppLauncherCard
           v-for="service in cluster.services"
           :key="service.id"
+          :cluster-id="cluster.id"
           :service="service"
         />
       </div>
@@ -81,6 +81,5 @@ export default {
   height: var(--header-height);
   position: sticky;
   top: 0;
-  z-index: 1;
 }
 </style>
