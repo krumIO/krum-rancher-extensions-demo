@@ -1,13 +1,16 @@
 import { IPlugin } from '@shell/core/types';
+import { PRODUCT_NAME } from './config/app-launcher';
+import { MAIN_APP_LAUNCHER_LOCATION } from './routing/extension-routing';
 
 export function init($plugin: IPlugin, store: any) {
-  const YOUR_PRODUCT_NAME = 'App Launcher';
+  const { product } = $plugin.DSL(store, PRODUCT_NAME);
 
-  const { product } = $plugin.DSL(store, YOUR_PRODUCT_NAME);
-
+  // registering a top-level product
   product({
-    icon:    'apps',
+    category: 'global',
+    icon: 'apps',
     inStore: 'management',
-    weight:  100
+    to: MAIN_APP_LAUNCHER_LOCATION,
+    weight: 3,
   });
 }

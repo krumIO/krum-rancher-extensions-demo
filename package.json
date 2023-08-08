@@ -12,6 +12,9 @@
   "packageManager": "yarn@3.6.1",
   "resolutions": {
     "@types/node": "^16",
+    "vue-loader": "^15.10.1",
+    "vue-server-renderer": "2.7.14",
+    "vue": "2.7.14",
     "webpack": "4"
   },
   "scripts": {
