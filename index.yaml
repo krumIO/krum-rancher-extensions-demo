@@ -12,9 +12,9 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-08-08T15:54:56.615681289Z"
+    created: "2023-08-09T14:11:49.678913437Z"
     description: app-launcher plugin
-    digest: 3cde3067a7d9ddfc2bb054d2f721a0d24f2e6e6151b29c1e163ca27088296585
+    digest: 810d0434b87ab517ad627dff742f3deb952d23c6cbac3cf9eda387969a5a683c
     name: app-launcher
     type: application
     urls:
@@ -32,12 +32,12 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-08-08T15:54:56.616054695Z"
+    created: "2023-08-09T14:11:49.679242436Z"
     description: pirate-locale plugin
-    digest: 90234e0fb1747346adb14b18b93a2e06cd8f630bc6f58bedc6d40a1cb529c5d3
+    digest: cfca60f24f148832c024457eb56f1b052c938876373e43abf8ef6f9ff563f1b9
     name: pirate-locale
     type: application
     urls:
     - assets/pirate-locale/pirate-locale-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-08T15:54:56.614185366Z"
+generated: "2023-08-09T14:11:49.677637444Z"
