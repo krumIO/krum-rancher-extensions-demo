@@ -1,0 +1,5 @@
+plugin/package.json
+plugin/pirate-locale-0.1.1.umd.min.1.js
+plugin/pirate-locale-0.1.1.umd.min.1.js.map
+plugin/pirate-locale-0.1.1.umd.min.js
+plugin/pirate-locale-0.1.1.umd.min.js.map
