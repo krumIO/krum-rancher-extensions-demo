@@ -1,7 +1,7 @@
 {
   "name": "app-launcher",
   "description": "app-launcher plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "rancher": true,
   "scripts": {
