@@ -1,0 +1,19 @@
+{
+  "name": "pirate-locale",
+  "description": "pirate-locale plugin",
+  "version": "0.1.2",
+  "private": false,
+  "rancher": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "5.0.8",
+    "@vue/cli-service": "5.0.8",
+    "@vue/cli-plugin-typescript": "5.0.8"
+  },
+  "files": [
+    "**/*"
+  ],
+  "main": "pirate-locale-0.1.2.umd.min.js"
+}
