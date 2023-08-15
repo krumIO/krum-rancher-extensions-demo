@@ -11,10 +11,29 @@ entries:
       catalog.cattle.io/scope: management
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
-    appVersion: 0.1.1
-    created: "2023-08-15T17:33:36.997789083Z"
+    appVersion: 0.1.2
+    created: "2023-08-15T17:40:11.522691283Z"
     description: app-launcher plugin
-    digest: 67fa59a96574583c352a1aae5355729fa082eb1990b90897d045b858a8220c65
+    digest: 640ea319c2f6e3580aa7245079bb38e637da2045240a7d999d5f03f5f8d1f0e7
+    name: app-launcher
+    type: application
+    urls:
+    - assets/app-launcher/app-launcher-0.1.2.tgz
+    version: 0.1.2
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/kube-version: '>= 1.16.0-0 < 1.28.0-0'
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= 2.7.0-0 < 2.8.0-0'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
+    apiVersion: v2
+    appVersion: 0.1.1
+    created: "2023-08-10T20:25:39.468536988Z"
+    description: app-launcher plugin
+    digest: 80528230d6be8e0a976afb221f6e5be895a44a9ebd44efc4b06677863d0517a3
     name: app-launcher
     type: application
     urls:
@@ -32,12 +51,12 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.1
-    created: "2023-08-15T17:33:36.999197682Z"
+    created: "2023-08-15T17:40:11.52311049Z"
     description: pirate-locale plugin
-    digest: 6aa0df77fdfaa700746ad1f567f2b10d63839d06c10dccec1d075725bae00edb
+    digest: 1cda3a2ba6861989ee77506785d86d8002097b524b151395485fd721ee09e8ed
     name: pirate-locale
     type: application
     urls:
     - assets/pirate-locale/pirate-locale-0.1.1.tgz
     version: 0.1.1
-generated: "2023-08-15T17:33:36.996279684Z"
+generated: "2023-08-15T17:40:11.521834869Z"
