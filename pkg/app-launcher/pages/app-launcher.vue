@@ -2,8 +2,8 @@
 import { MANAGEMENT } from '@shell/config/types';
 import { ref, onMounted, getCurrentInstance } from 'vue';
 import Loading from '@shell/components/Loading';
-import AppLauncherCard from '../components/AppLauncherCard.vue';
-import type { AppLauncherService } from '../components/AppLauncherCard.vue';
+import AppLauncherCard from '../components/AppLauncherCard';
+import type { AppLauncherService } from '../components/AppLauncherCard';
 
 const store = getCurrentInstance()?.proxy.$store;
 
