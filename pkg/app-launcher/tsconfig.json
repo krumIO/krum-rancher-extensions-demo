@@ -33,8 +33,5 @@
     }
   },
   "include": ["**/*.ts", "**/*.d.ts", "**/*.tsx", "**/*.vue"],
-  "exclude": ["../../node_modules"],
-  "vueCompilerOptions": {
-    "target": 2.7
-  }
+  "exclude": ["../../node_modules"]
 }
