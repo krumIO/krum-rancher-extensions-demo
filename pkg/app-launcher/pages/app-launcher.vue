@@ -30,6 +30,10 @@ const fetchServicesByCluster = async () => {
           })
         ).data,
       }))
+  ).then((data) => {
+      console.log(data);
+      return data;
+    }
   );
 };
 

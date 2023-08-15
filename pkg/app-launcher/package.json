@@ -1,7 +1,7 @@
 {
   "name": "app-launcher",
   "description": "app-launcher plugin",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": false,
   "rancher": {
     "catalog.cattle.io/display-name": "AppLauncher",
