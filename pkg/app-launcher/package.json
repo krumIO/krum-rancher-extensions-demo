@@ -1,7 +1,7 @@
 {
   "name": "app-launcher",
   "description": "App Launcher plugin for Rancher. Stop digging for services and ingresses!",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": false,
   "rancher": {
     "catalog.cattle.io/display-name": "AppLauncher",

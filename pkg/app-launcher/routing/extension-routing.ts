@@ -1,6 +1,6 @@
 import type { RouteConfig } from 'vue-router';
 import { PRODUCT_NAME } from '../config/app-launcher';
-import AppLauncher from '../pages/app-launcher';
+import AppLauncher from '../pages/app-launcher.vue';
 
 const MAIN_APP_LAUNCHER_LOCATION: RouteConfig = {
   component: AppLauncher,
