@@ -12,14 +12,34 @@ entries:
       catalog.cattle.io/scope: management
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
-    appVersion: 0.1.5
-    created: "2023-08-15T19:56:59.751941087Z"
-    description: app-launcher plugin
-    digest: a13ffb6ed39ff93ed86b40f3a59c295883c1e297c26a66d7d398accb4676b0b1
+    appVersion: 0.1.6
+    created: "2023-08-16T20:28:22.534949588Z"
+    description: App Launcher plugin for Rancher. Stop digging for services and ingresses!
+    digest: 1aaa2dd77b735756421a89a5d8efb593c4d6ca160bdac87ef9e6193cf41db5c9
     name: app-launcher
     type: application
     urls:
-    - assets/app-launcher/app-launcher-0.1.5.tgz
+    - assets/app-launcher/app-launcher-0.1.6.tgz
+    version: 0.1.6
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/display-name: AppLauncher
+      catalog.cattle.io/kube-version: '>= 1.16.0-0 < 1.28.0-0'
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= 2.7.0-0 < 2.8.0-0'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
+    apiVersion: v2
+    appVersion: 0.1.5
+    created: "2023-08-15T19:57:32.071331123Z"
+    description: app-launcher plugin
+    digest: 7ba0391c3b0be11dd093a6ebd2de95762bd4a0d31f53687fe0452ca5909a39f4
+    name: app-launcher
+    type: application
+    urls:
+    - https://github.com/krumIO/krum-rancher-extensions-demo/releases/download/app-launcher-0.1.5/app-launcher-0.1.5.tgz
     version: 0.1.5
   - annotations:
       catalog.cattle.io/certified: rancher
@@ -110,9 +130,9 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.2
-    created: "2023-08-15T19:56:59.752378693Z"
+    created: "2023-08-16T20:28:22.535363699Z"
     description: pirate-locale plugin
-    digest: 03ffa7ae02cf9ec96b0c73a3605c0f1294eb608ba1967c5ed253b9909bc22e63
+    digest: 8684eb0e0366a5885a60f878d26bf77ab813d5e1225048863b02f0e4623feee8
     name: pirate-locale
     type: application
     urls:
@@ -137,4 +157,4 @@ entries:
     urls:
     - assets/pirate-locale/pirate-locale-0.1.1.tgz
     version: 0.1.1
-generated: "2023-08-15T19:56:59.750020063Z"
+generated: "2023-08-16T20:28:22.534350772Z"
