@@ -1,14 +1,9 @@
 {
   "name": "app-launcher",
   "description": "App Launcher plugin for Rancher",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": false,
-  "rancher": {
-    "catalog.cattle.io/display-name": "AppLauncher",
-    "annotations": {
-      "catalog.cattle.io/display-name": "AppLauncher"
-    }
-  },
+  "rancher": true,
   "scripts": {
     "dev": "./node_modules/.bin/nuxt dev",
     "nuxt": "./node_modules/.bin/nuxt"
