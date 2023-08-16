@@ -1,0 +1,5 @@
+plugin/app-launcher-0.1.9.umd.min.1.js
+plugin/app-launcher-0.1.9.umd.min.1.js.map
+plugin/app-launcher-0.1.9.umd.min.js
+plugin/app-launcher-0.1.9.umd.min.js.map
+plugin/package.json
