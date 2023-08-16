@@ -2,7 +2,7 @@
 import { MANAGEMENT } from '@shell/config/types';
 import { ref, onMounted, getCurrentInstance } from 'vue';
 import Loading from '@shell/components/Loading';
-import AppLauncherCard from '../components/AppLauncherCard.vue';
+// import AppLauncherCard from '../components/AppLauncherCard.vue';
 import type { AppLauncherService } from '../components/AppLauncherCard.vue';
 
 const store = getCurrentInstance()?.proxy.$store;
@@ -59,12 +59,12 @@ export default {
           {{ cluster.name }}
         </h1>
         <div class="services-by-cluster-grid">
-          <AppLauncherCard
+          <!-- <AppLauncherCard
             v-for="service in cluster.services"
             :key="service.id"
             :cluster-id="cluster.id"
             :service="service"
-          />
+          /> -->
         </div>
       </div>
     </div>
