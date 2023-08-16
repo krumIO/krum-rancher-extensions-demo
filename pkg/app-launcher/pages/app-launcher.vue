@@ -14,7 +14,11 @@ const servicesByCluster = ref<
 const fetchServicesByCluster = async () => {
   const allClusters = await store.dispatch(`management/findAll`, {
     type: MANAGEMENT.CLUSTER,
-  });
+  }).then((data) => {
+      console.log(data);
+      return data;
+    }
+  );
 
   servicesByCluster.value = await Promise.all(
     allClusters
@@ -49,25 +53,27 @@ export default {
 </script>
 
 <template>
-  <Loading v-if="Boolean(false)" />
-  <div v-else>
-    <div
-      v-for="cluster in servicesByCluster"
-      :key="cluster.id"
-      style="margin-bottom: 2rem"
-    >
-      <h1
-        class="cluster-header hack-to-keep-header-above-app-launcher-card-dropdown-button"
+  <div>
+    <Loading v-if="Boolean(false)" />
+    <div v-else>
+      <div
+        v-for="cluster in servicesByCluster"
+        :key="cluster.id"
+        style="margin-bottom: 2rem"
       >
-        {{ cluster.name }}
-      </h1>
-      <div class="services-by-cluster-grid">
-        <AppLauncherCard
-          v-for="service in cluster.services"
-          :key="service.id"
-          :cluster-id="cluster.id"
-          :service="service"
-        />
+        <h1
+          class="cluster-header hack-to-keep-header-above-app-launcher-card-dropdown-button"
+        >
+          {{ cluster.name }}
+        </h1>
+        <div class="services-by-cluster-grid">
+          <AppLauncherCard
+            v-for="service in cluster.services"
+            :key="service.id"
+            :cluster-id="cluster.id"
+            :service="service"
+          />
+        </div>
       </div>
     </div>
   </div>
