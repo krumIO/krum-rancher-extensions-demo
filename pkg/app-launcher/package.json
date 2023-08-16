@@ -1,6 +1,6 @@
 {
   "name": "app-launcher",
-  "description": "App Launcher plugin for Rancher",
+  "description": "App Launcher plugin for Rancher. Stop digging for services and ingresses!",
   "version": "0.1.6",
   "private": false,
   "rancher": {
