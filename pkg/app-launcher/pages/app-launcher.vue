@@ -14,11 +14,7 @@ const servicesByCluster = ref<
 const fetchServicesByCluster = async () => {
   const allClusters = await store.dispatch(`management/findAll`, {
     type: MANAGEMENT.CLUSTER,
-  }).then((data) => {
-      console.log(data);
-      return data;
-    }
-  );
+  });
 
   servicesByCluster.value = await Promise.all(
     allClusters
@@ -34,10 +30,6 @@ const fetchServicesByCluster = async () => {
           })
         ).data,
       }))
-  ).then((data) => {
-      console.log(data);
-      return data;
-    }
   );
 };
 
