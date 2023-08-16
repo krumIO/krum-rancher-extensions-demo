@@ -11,14 +11,33 @@ entries:
       catalog.cattle.io/scope: management
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
-    appVersion: 0.1.9
-    created: "2023-08-16T21:24:22.988840646Z"
+    appVersion: 0.1.10
+    created: "2023-08-16T21:26:18.447766473Z"
     description: App Launcher plugin for Rancher
-    digest: c6218ef1cda47cf42e90aee04492e20ca383e0a7e1c913253dc397fff51a2e38
+    digest: 4467606c3a54bcfe5c32df3a8ceab8333af284f9f74d1ec82992a89ce8a779f9
     name: app-launcher
     type: application
     urls:
-    - assets/app-launcher/app-launcher-0.1.9.tgz
+    - assets/app-launcher/app-launcher-0.1.10.tgz
+    version: 0.1.10
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/kube-version: '>= 1.16.0-0 < 1.28.0-0'
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= 2.7.0-0 < 2.8.0-0'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
+    apiVersion: v2
+    appVersion: 0.1.9
+    created: "2023-08-16T21:24:42.566698189Z"
+    description: App Launcher plugin for Rancher
+    digest: cf59cf098648eef5e784594bb17b5dda1c974a7fab3a6fc5402dfa4eebb4f68d
+    name: app-launcher
+    type: application
+    urls:
+    - https://github.com/krumIO/krum-rancher-extensions-demo/releases/download/app-launcher-0.1.9/app-launcher-0.1.9.tgz
     version: 0.1.9
   - annotations:
       catalog.cattle.io/certified: rancher
@@ -188,9 +207,9 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.2
-    created: "2023-08-16T21:24:22.989221953Z"
+    created: "2023-08-16T21:26:18.448684283Z"
     description: pirate-locale plugin
-    digest: 91a65eb4d06fbb2ce0968d3115b81c357217d525eaffae064c9bf09b6c7fa7bc
+    digest: ba747a8e0c1a631b03c1ac501392cbba90660cc1a0e68b39bb5772e632dbc73b
     name: pirate-locale
     type: application
     urls:
@@ -215,4 +234,4 @@ entries:
     urls:
     - assets/pirate-locale/pirate-locale-0.1.1.tgz
     version: 0.1.1
-generated: "2023-08-16T21:24:22.98797993Z"
+generated: "2023-08-16T21:26:18.446962264Z"
