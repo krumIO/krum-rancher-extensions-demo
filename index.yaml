@@ -12,6 +12,26 @@ entries:
       catalog.cattle.io/scope: management
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
+    appVersion: 0.1.6
+    created: "2023-08-16T20:28:48.585950735Z"
+    description: App Launcher plugin for Rancher. Stop digging for services and ingresses!
+    digest: 1f1ba6385cc8448173f8c22afafd8e8ec781e349e721e16f886b6517cfe32416
+    name: app-launcher
+    type: application
+    urls:
+    - https://github.com/krumIO/krum-rancher-extensions-demo/releases/download/app-launcher-0.1.6/app-launcher-0.1.6.tgz
+    version: 0.1.6
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/display-name: AppLauncher
+      catalog.cattle.io/kube-version: '>= 1.16.0-0 < 1.28.0-0'
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= 2.7.0-0 < 2.8.0-0'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
+    apiVersion: v2
     appVersion: 0.1.5
     created: "2023-08-15T19:57:32.071331123Z"
     description: app-launcher plugin
@@ -137,4 +157,4 @@ entries:
     urls:
     - assets/pirate-locale/pirate-locale-0.1.1.tgz
     version: 0.1.1
-generated: "2023-08-15T19:57:32.071370723Z"
+generated: "2023-08-16T20:28:48.585984736Z"
