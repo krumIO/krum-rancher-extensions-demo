@@ -1,51 +1,47 @@
-<script lang="ts" setup>
+<script>
 import { MANAGEMENT } from '@shell/config/types';
-import { ref, onMounted, getCurrentInstance } from 'vue';
 import Loading from '@shell/components/Loading';
 import AppLauncherCard from '../components/AppLauncherCard.vue';
-import type { AppLauncherService } from '../components/AppLauncherCard.vue';
 
-const store = getCurrentInstance()?.proxy.$store;
-
-const servicesByCluster = ref<
-  { id: string; name: string; services: AppLauncherService[] }[]
->([]);
-
-const fetchServicesByCluster = async () => {
-  const allClusters = await store.dispatch(`management/findAll`, {
-    type: MANAGEMENT.CLUSTER,
-  });
-
-  servicesByCluster.value = await Promise.all(
-    allClusters
-      .filter((cluster) => cluster.isReady)
-      .map(async (cluster) => ({
-        name: `${store.getters['i18n/t']('nav.group.cluster')} ${
-          cluster.spec.displayName
-        }`,
-        id: cluster.id,
-        services: (
-          await store.dispatch('cluster/request', {
-            url: `/k8s/clusters/${cluster.id}/v1/services`,
-          })
-        ).data,
-      }))
-  );
-};
-
-onMounted(() => {
-  fetchServicesByCluster();
-});
-</script>
-
-<script lang="ts">
 export default {
+  components: {
+    Loading,
+    AppLauncherCard,
+  },
+  data() {
+    return {
+      servicesByCluster: [],
+      loading: true,
+    };
+  },
+  async fetch() {
+    const allClusters = await this.$store.dispatch(`management/findAll`, {
+      type: MANAGEMENT.CLUSTER,
+    });
+
+    this.servicesByCluster = await Promise.all(
+      allClusters
+        .filter((cluster) => cluster.isReady)
+        .map(async (cluster) => ({
+          name: `${this.$store.getters['i18n/t']('nav.group.cluster')} ${
+            cluster.spec.displayName
+          }`,
+          id: cluster.id,
+          services: (
+            await this.$store.dispatch('cluster/request', {
+              url: `/k8s/clusters/${cluster.id}/v1/services`,
+            })
+          ).data,
+        }))
+    );
+    this.loading = false;
+  },
   layout: 'plain',
 };
 </script>
 
 <template>
-  <Loading v-if="Boolean(false)" />
+  <Loading v-if="loading" />
   <div v-else>
     <div
       v-for="cluster in servicesByCluster"
