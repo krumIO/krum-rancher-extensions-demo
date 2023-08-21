@@ -1,7 +1,7 @@
 {
-  "name": "pirate-locale",
-  "description": "pirate-locale plugin",
-  "version": "0.1.2",
+  "name": "app-launcher",
+  "description": "App Launcher plugin for Rancher",
+  "version": "0.1.12",
   "private": false,
   "rancher": true,
   "engines": {
@@ -15,5 +15,5 @@
   "files": [
     "**/*"
   ],
-  "main": "pirate-locale-0.1.2.umd.min.js"
+  "main": "app-launcher-0.1.12.umd.min.js"
 }
