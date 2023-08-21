@@ -2,7 +2,7 @@
 import { MANAGEMENT } from '@shell/config/types';
 import { ref, onMounted, getCurrentInstance } from 'vue';
 import Loading from '@shell/components/Loading';
-// import AppLauncherCard from '../components/AppLauncherCard.vue';
+import AppLauncherCard from '../components/AppLauncherCard.vue';
 import type { AppLauncherService } from '../components/AppLauncherCard.vue';
 
 const store = getCurrentInstance()?.proxy.$store;
@@ -45,27 +45,25 @@ export default {
 </script>
 
 <template>
-  <div>
-    <Loading v-if="Boolean(false)" />
-    <div v-else>
-      <div
-        v-for="cluster in servicesByCluster"
-        :key="cluster.id"
-        style="margin-bottom: 2rem"
+  <Loading v-if="Boolean(false)" />
+  <div v-else>
+    <div
+      v-for="cluster in servicesByCluster"
+      :key="cluster.id"
+      style="margin-bottom: 2rem"
+    >
+      <h1
+        class="cluster-header hack-to-keep-header-above-app-launcher-card-dropdown-button"
       >
-        <h1
-          class="cluster-header hack-to-keep-header-above-app-launcher-card-dropdown-button"
-        >
-          {{ cluster.name }}
-        </h1>
-        <div class="services-by-cluster-grid">
-          <!-- <AppLauncherCard
-            v-for="service in cluster.services"
-            :key="service.id"
-            :cluster-id="cluster.id"
-            :service="service"
-          /> -->
-        </div>
+        {{ cluster.name }}
+      </h1>
+      <div class="services-by-cluster-grid">
+        <AppLauncherCard
+          v-for="service in cluster.services"
+          :key="service.id"
+          :cluster-id="cluster.id"
+          :service="service"
+        />
       </div>
     </div>
   </div>
