@@ -102,7 +102,7 @@ export default {
 </script>
 
 <template>
-  <Card :show-highlight-border="false">
+  <Card :show-highlight-border="false" :sticky="true">
     <template #title>
       <div style="width: 100%">
         <p style="font-size: 1.2rem">
