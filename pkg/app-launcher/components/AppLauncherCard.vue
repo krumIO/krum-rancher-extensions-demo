@@ -18,7 +18,7 @@ export default {
 
           return {
             label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
-            value: `k8s/clusters/${this.clusterId}/api/v1/namespaces/${this.service.metadata.namespace}/services/${endpoint}/proxy`,
+            value: `/k8s/clusters/${this.clusterId}/api/v1/namespaces/${this.service.metadata.namespace}/services/${endpoint}/proxy`,
           };
         }) ?? []
       );
@@ -102,7 +102,7 @@ export default {
 </script>
 
 <template>
-  <Card :show-highlight-border="false" :sticky="true">
+  <Card :show-highlight-border="false">
     <template #title>
       <div style="width: 100%">
         <p style="font-size: 1.2rem">
