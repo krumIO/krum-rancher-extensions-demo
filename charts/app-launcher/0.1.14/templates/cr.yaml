@@ -8,5 +8,5 @@ spec:
   plugin:
     name: {{ include "extension-server.fullname" . }}
     version: {{ (semver (default .Chart.AppVersion .Values.plugin.versionOverride)).Original }}
-    endpoint: https://raw.githubusercontent.com/krumIO/krum-rancher-extensions/gh-pages/extensions/pirate-locale/0.1.2
+    endpoint: https://raw.githubusercontent.com/krumIO/krum-rancher-extensions/gh-pages/extensions/app-launcher/0.1.14
     noCache: {{ .Values.plugin.noCache }}
