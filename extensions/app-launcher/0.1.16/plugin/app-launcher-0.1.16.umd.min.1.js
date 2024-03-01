@@ -1,0 +1,2 @@
+(("undefined"!==typeof self?self:this)["webpackJsonpapp_launcher_0_1_16"]=("undefined"!==typeof self?self:this)["webpackJsonpapp_launcher_0_1_16"]||[]).push([[1],{"1bb6":function(n,p){const e=[{product:{"app-launcher":"App Launcher"},appLauncher:{launch:"Launch",launchEndpoint:"Launch {endpoint}",launchAnEndpointFromSelection:"Select an endpoint to launch",noEndpointFoundForApp:"No endpoint found for app"}}];n.exports=e.length<=1?e[0]:e}}]);
+//# sourceMappingURL=app-launcher-0.1.16.umd.min.1.js.map
