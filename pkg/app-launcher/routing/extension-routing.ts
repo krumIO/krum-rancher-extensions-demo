@@ -1,13 +1,17 @@
-import type { RouteConfig } from 'vue-router';
-import { PRODUCT_NAME } from '../config/app-launcher';
-import AppLauncher from "../pages/app-launcher.vue";
+import Dashboard from '../pages/index.vue';
+import { PRODUCT_NAME, BLANK_CLUSTER } from '../config/app-launcher';
 
-const MAIN_APP_LAUNCHER_LOCATION: RouteConfig = {
-  component: () => AppLauncher,
-  name: PRODUCT_NAME,
-  path: `/${PRODUCT_NAME}`,
-};
-const routes = [MAIN_APP_LAUNCHER_LOCATION];
+const routes = [
+  {
+    name:      `${ PRODUCT_NAME }-c-cluster`,
+    path:      `/${ PRODUCT_NAME }/c/:cluster`,
+    component: Dashboard,
+    meta:      {
+      product: PRODUCT_NAME,
+      cluster: BLANK_CLUSTER,
+      pkg:     PRODUCT_NAME
+    }
+  }
+];
 
-export { MAIN_APP_LAUNCHER_LOCATION };
 export default routes;

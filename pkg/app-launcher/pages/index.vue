@@ -14,27 +14,40 @@ export default {
       loading: true,
     };
   },
-  async fetch() {
-    const allClusters = await this.$store.dispatch(`management/findAll`, {
-      type: MANAGEMENT.CLUSTER,
-    });
-
-    this.servicesByCluster = await Promise.all(
-      allClusters
-        .filter((cluster) => cluster.isReady)
-        .map(async (cluster) => ({
-          name: `${this.$store.getters['i18n/t']('nav.group.cluster')} ${
-            cluster.spec.displayName
-          }`,
-          id: cluster.id,
-          services: (
-            await this.$store.dispatch('cluster/request', {
-              url: `/k8s/clusters/${cluster.id}/v1/services`,
-            })
-          ).data,
-        }))
-    );
-    this.loading = false;
+  async mounted() {
+    console.log('mounted');
+    try {
+      const allClusters = await this.getClusters();
+      this.servicesByCluster = await this.getServicesByCluster(allClusters);
+    } catch (error) {
+      console.error('Error fetching clusters', error);
+    } finally{
+      this.loading = false;
+    };
+  },
+  methods: {
+    async getClusters() {
+      return await this.$store.dispatch(`management/findAll`, {
+        type: MANAGEMENT.CLUSTER,
+      });
+    },
+    async getServicesByCluster(allClusters) {
+      return await Promise.all(
+        allClusters
+          .filter((cluster) => cluster.isReady)
+          .map(async (cluster) => ({
+            name: `${this.$store.getters['i18n/t']('nav.group.cluster')} ${
+              cluster.spec.displayName
+            }`,
+            id: cluster.id,
+            services: (
+              await this.$store.dispatch('cluster/request', {
+                url: `/k8s/clusters/${cluster.id}/v1/services`,
+              })
+            ).data,
+          }))
+      );
+    },
   },
   layout: 'plain',
 };
@@ -43,14 +56,8 @@ export default {
 <template>
   <Loading v-if="loading" />
   <div v-else>
-    <div
-      v-for="cluster in servicesByCluster"
-      :key="cluster.id"
-      style="margin-bottom: 2rem"
-    >
-      <h1
-        class="cluster-header hack-to-keep-header-above-app-launcher-card-dropdown-button"
-      >
+    <div v-for="cluster in servicesByCluster" :key="cluster.id" style="margin-bottom: 2rem">
+      <h1 class="cluster-header hack-to-keep-header-above-app-launcher-card-dropdown-button">
         {{ cluster.name }}
       </h1>
       <div class="services-by-cluster-grid">
