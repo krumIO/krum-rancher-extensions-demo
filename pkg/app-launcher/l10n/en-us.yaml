@@ -6,3 +6,7 @@ appLauncher:
   launchEndpoint: Launch {endpoint}
   launchAnEndpointFromSelection: Select an endpoint to launch
   noEndpointFoundForApp: No endpoint found for app
+  noServicesFound: No services found
+  loading: Loading...
+  loadingServices: Loading services...
+  selectCluster: Select a cluster
