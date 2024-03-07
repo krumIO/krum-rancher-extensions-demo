@@ -25,6 +25,7 @@ export default {
       selectedCluster: null,
       clusterOptions: [],
       selectedView: 'grid',
+      favoritedServices: [],
       tableHeaders: [
         {
           name: 'name',
@@ -146,6 +147,31 @@ export default {
         }) ?? []
       );
     },
+    openLink(link) {
+      window.open(link, '_blank');
+    },
+    toggleFavorite(service) {
+      const index = this.favoritedServices.findIndex(
+        (favoritedService) =>
+          favoritedService.clusterId === this.selectedCluster &&
+          favoritedService.service.id === service.id
+      );
+      if (index !== -1) {
+        this.favoritedServices.splice(index, 1);
+      } else {
+        this.favoritedServices.push({
+          clusterId: this.selectedCluster,
+          service,
+        });
+      }
+    },
+    isFavorited(service, favoritedServices) {
+      return favoritedServices.some(
+        (favoritedService) =>
+          favoritedService.clusterId === this.selectedCluster &&
+          favoritedService.service.id === service.id
+      );
+    },
   },
   computed: {
     selectedClusterData() {
@@ -173,6 +199,19 @@ export default {
 <template>
   <Loading v-if="loading" :label="$store.getters['i18n/t']('appLauncher.loading')" />
   <div v-else>
+    <div v-if="favoritedServices.length > 0">
+      <h2>{{ t('appLauncher.globalApps') }}</h2>
+      <div class="services-by-cluster-grid">
+        <AppLauncherCard
+          v-for="favoritedService in favoritedServices"
+          :key="`${favoritedService.clusterId}-${favoritedService.service.id}`"
+          :cluster-id="favoritedService.clusterId"
+          :service="favoritedService.service"
+          :favorited-services="favoritedServices"
+          @toggle-favorite="toggleFavorite"
+        />
+      </div>
+    </div>
     <div class="cluster-header">
       <h1>{{ selectedCluster ? getClusterName(selectedCluster) : $store.getters['i18n/t']('appLauncher.selectCluster') }}</h1>
       <div class="cluster-actions">
@@ -205,6 +244,8 @@ export default {
           :key="service.id"
           :cluster-id="selectedCluster"
           :service="service"
+          :favorited-services="favoritedServices"
+          @toggle-favorite="toggleFavorite"
         />
       </div>
       <div v-else-if="selectedView === 'list'">
@@ -231,6 +272,9 @@ export default {
           </template>
           <template #cell:actions="{row}">
             <div style="display: flex; justify-content: flex-end;">
+              <button class="icon-button favorite-icon" @click="toggleFavorite(row)">
+                <i :class="['icon', isFavorited(row, favoritedServices) ? 'icon-star' : 'icon-star-open']" />
+              </button>
               <a
                 v-if="getEndpoints(row)?.length <= 1"
                 :href="getEndpoints(row)[0]?.value"
@@ -277,6 +321,7 @@ export default {
   height: var(--header-height);
   position: sticky;
   top: 0;
+  z-index: 1;
 }
 
 .cluster-actions {
@@ -291,7 +336,11 @@ export default {
   cursor: pointer;
   padding: 0;
   color: var(--primary);
-  font-size: 1.25rem;
+  font-size: 1.8rem;
+}
+
+.favorite-icon {
+  margin-right: 1rem;
 }
 
 .icon-button:hover {

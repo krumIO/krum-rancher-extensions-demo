@@ -8,43 +8,13 @@ export default {
     Card,
     ButtonDropDown,
   },
-  computed: {
-    endpoints() {
-      return (
-        this.service?.spec.ports?.map((port) => {
-          const endpoint = `${
-            isMaybeSecure(port.port, port.protocol) ? 'https' : 'http'
-          }:${this.service.metadata.name}:${port.port}`;
-
-          return {
-            label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
-            value: `/k8s/clusters/${this.clusterId}/api/v1/namespaces/${this.service.metadata.namespace}/services/${endpoint}/proxy`,
-          };
-        }) ?? []
-      );
-    },
-    computedServiceName() {
-      return (
-        this.service?.metadata.labels?.['app.kubernetes.io/component'] ??
-        this.service?.metadata.name
-      );
-    },
-    helmChart() {
-      return this.service?.metadata.labels?.['helm.sh/chart'];
-    },
-    kubernetesVersion() {
-      return this.service?.metadata.labels?.['app.kubernetes.io/version'];
-    },
-    name() {
-      return this.service?.metadata.name;
-    },
-    namespace() {
-      return this.service?.metadata.namespace;
-    },
-  },
   props: {
     clusterId: {
       type: String,
+      required: true,
+    },
+    favoritedServices: {
+      type: Array,
       required: true,
     },
     service: {
@@ -95,6 +65,50 @@ export default {
     openLink(link) {
       window.open(link);
     },
+    toggleFavorite() {
+      this.$emit('toggle-favorite', this.service);
+    },
+  },
+  computed: {
+    endpoints() {
+      return (
+        this.service?.spec.ports?.map((port) => {
+          const endpoint = `${
+            isMaybeSecure(port.port, port.protocol) ? 'https' : 'http'
+          }:${this.service.metadata.name}:${port.port}`;
+
+          return {
+            label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
+            value: `/k8s/clusters/${this.clusterId}/api/v1/namespaces/${this.service.metadata.namespace}/services/${endpoint}/proxy`,
+          };
+        }) ?? []
+      );
+    },
+    computedServiceName() {
+      return (
+        this.service?.metadata.labels?.['app.kubernetes.io/component'] ??
+        this.service?.metadata.name
+      );
+    },
+    helmChart() {
+      return this.service?.metadata.labels?.['helm.sh/chart'];
+    },
+    kubernetesVersion() {
+      return this.service?.metadata.labels?.['app.kubernetes.io/version'];
+    },
+    name() {
+      return this.service?.metadata.name;
+    },
+    namespace() {
+      return this.service?.metadata.namespace;
+    },
+    isFavorited() {
+      return this.favoritedServices.some(
+        (favoritedService) =>
+          favoritedService.clusterId === this.clusterId &&
+          favoritedService.service.id === this.service.id
+      );
+    },
   },
   name: 'AppLauncherCard',
   layout: 'plain',
@@ -129,6 +143,9 @@ export default {
       <p>{{ namespace }}/{{ name }}</p>
     </template>
     <template #actions>
+      <button class="icon-button" @click="toggleFavorite">
+        <i :class="['icon', isFavorited ? 'icon-star' : 'icon-star-open']" />
+      </button>
       <a
         v-if="(endpoints?.length ?? 0) <= 1"
         :disabled="!endpoints?.length"
@@ -156,3 +173,17 @@ export default {
     </template>
   </Card>
 </template>
+
+<style lang="scss" scoped>
+@import "@shell/assets/styles/fonts/_icons.scss";
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin-right: 1rem;
+}
+</style>
