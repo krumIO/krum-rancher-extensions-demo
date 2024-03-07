@@ -7,8 +7,6 @@ import { isMaybeSecure } from '@shell/utils/url';
 
 import AppLauncherCard from '../components/AppLauncherCard.vue';
 
-import { mockServicesByCluster } from '../mock/mockData';
-
 export default {
   components: {
     Loading,
@@ -59,13 +57,9 @@ export default {
     };
   },
   async mounted() {
-    console.log('mounted');
     try {
       const allClusters = await this.getClusters();
       this.servicesByCluster = await this.getServicesByCluster(allClusters);
-      this.mockServicesByCluster = await this.getMockServicesByCluster();
-      this.servicesByCluster.push(...this.mockServicesByCluster);
-      console.log('servicesByCluster', this.servicesByCluster);
 
       // Set the first cluster as the selected cluster
       if (this.servicesByCluster.length > 0) {
@@ -128,7 +122,6 @@ export default {
         label: cluster.name,
         value: cluster.id,
       }));
-      console.log('clusterOptions', this.clusterOptions);
     },
     toggleSortOrder() {
       this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
