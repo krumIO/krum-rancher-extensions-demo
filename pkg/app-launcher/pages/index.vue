@@ -2,6 +2,8 @@
 import { MANAGEMENT } from '@shell/config/types';
 import Loading from '@shell/components/Loading';
 import SortableTable from '@shell/components/SortableTable';
+import ButtonDropDown from '@shell/components/ButtonDropdown';
+import { isMaybeSecure } from '@shell/utils/url';
 
 import AppLauncherCard from '../components/AppLauncherCard.vue';
 
@@ -11,7 +13,8 @@ export default {
   components: {
     Loading,
     AppLauncherCard,
-    SortableTable
+    SortableTable,
+    ButtonDropDown
   },
   data() {
     return {
@@ -29,6 +32,27 @@ export default {
           value: 'metadata.name',
           sort: 'metadata.name',
           sortOrder: 'asc',
+        },
+        {
+          name: 'namespace',
+          label: 'Namespace',
+          value: 'metadata.namespace',
+        },
+        {
+          name: 'version',
+          label: 'Version',
+          value: 'metadata.labels["app.kubernetes.io/version"]',
+        },
+        {
+          name: 'helmChart',
+          label: 'Helm Chart',
+          value: 'metadata.labels["helm.sh/chart"]',
+        },
+        {
+          name: 'actions',
+          label: 'Actions',
+          value: 'actions',
+          align: 'right',
         },
       ],
     };
@@ -108,6 +132,20 @@ export default {
     toggleSortOrder() {
       this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
     },
+    getEndpoints(service) {
+      return (
+        service?.spec.ports?.map((port) => {
+          const endpoint = `${
+            isMaybeSecure(port.port, port.protocol) ? 'https' : 'http'
+          }:${service.metadata.name}:${port.port}`;
+
+          return {
+            label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
+            value: `/k8s/clusters/${this.selectedCluster}/api/v1/namespaces/${service.metadata.namespace}/services/${endpoint}/proxy`,
+          };
+        }) ?? []
+      );
+    },
   },
   computed: {
     selectedClusterData() {
@@ -181,6 +219,35 @@ export default {
         >
           <template #cell:name="{row}">
             {{ row.metadata.name }}
+          </template>
+          <template #cell:namespace="{row}">
+            {{ row.metadata.namespace }}
+          </template>
+          <template #cell:version="{row}">
+            {{ row.metadata.labels?.['app.kubernetes.io/version'] }}
+          </template>
+          <template #cell:helmChart="{row}">
+            {{ row.metadata.labels?.['helm.sh/chart'] }}
+          </template>
+          <template #cell:actions="{row}">
+            <div style="display: flex; justify-content: flex-end;">
+              <a
+                v-if="getEndpoints(row)?.length <= 1"
+                :href="getEndpoints(row)[0]?.value"
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                class="btn role-primary"
+              >
+                {{ t('appLauncher.launch') }}
+              </a>
+              <ButtonDropDown
+                v-else
+                :button-label="t('appLauncher.launch')"
+                :dropdown-options="getEndpoints(row)"
+                :title="t('appLauncher.launchAnEndpointFromSelection')"
+                @click-action="(o) => openLink(o.value)"
+              />
+            </div>
           </template>
         </SortableTable>
       </div>
