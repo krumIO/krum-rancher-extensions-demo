@@ -1,6 +1,7 @@
 <script>
 import { MANAGEMENT } from '@shell/config/types';
 import Loading from '@shell/components/Loading';
+import SortableTable from '@shell/components/SortableTable';
 
 import AppLauncherCard from '../components/AppLauncherCard.vue';
 
@@ -10,6 +11,7 @@ export default {
   components: {
     Loading,
     AppLauncherCard,
+    SortableTable
   },
   data() {
     return {
@@ -19,6 +21,16 @@ export default {
       loading: true,
       selectedCluster: null,
       clusterOptions: [],
+      selectedView: 'grid',
+      tableHeaders: [
+        {
+          name: 'name',
+          label: 'Name',
+          value: 'metadata.name',
+          sort: 'metadata.name',
+          sortOrder: 'asc',
+        },
+      ],
     };
   },
   async mounted() {
@@ -93,6 +105,28 @@ export default {
       }));
       console.log('clusterOptions', this.clusterOptions);
     },
+    toggleSortOrder() {
+      this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
+    },
+  },
+  computed: {
+    selectedClusterData() {
+      return this.getCluster(this.selectedCluster);
+    },
+    sortedServices() {
+      if (this.selectedClusterData) {
+        return [...this.selectedClusterData.services].sort((a, b) => {
+          const nameA = a.metadata.name.toLowerCase();
+          const nameB = b.metadata.name.toLowerCase();
+          if (this.tableHeaders[0].sortOrder === 'asc') {
+            return nameA.localeCompare(nameB);
+          } else {
+            return nameB.localeCompare(nameA);
+          }
+        });
+      }
+      return [];
+    },
   },
   layout: 'plain',
 };
@@ -104,7 +138,7 @@ export default {
     <div class="cluster-header">
       <h1>{{ selectedCluster ? getClusterName(selectedCluster) : $store.getters['i18n/t']('appLauncher.selectCluster') }}</h1>
       <div class="cluster-actions">
-        <button class="icon-button">
+        <button class="icon-button" @click="toggleSortOrder" v-if="selectedView === 'grid'">
           <i class="icon icon-sort" />
         </button>
         <div class="select-wrapper">
@@ -114,27 +148,41 @@ export default {
             </option>
           </select>
         </div>
-        <button class="icon-button">
+        <button class="icon-button" @click="selectedView = 'grid'">
           <i class="icon icon-apps" />
         </button>
-        <button class="icon-button">
+        <button class="icon-button" @click="selectedView = 'list'">
           <i class="icon icon-list-flat" />
         </button>
       </div>
     </div>
     <div v-if="selectedCluster">
-      <p v-if="getCluster(selectedCluster).loading">{{ $store.getters['i18n/t']('appLauncher.loading') }}</p>
-      <div v-else class="services-by-cluster-grid">
-        <template v-if="getCluster(selectedCluster).services.length === 0">
+      <div v-if="selectedView === 'grid'" class="services-by-cluster-grid">
+        <template v-if="sortedServices.length === 0">
           <p>{{ $store.getters['i18n/t']('appLauncher.noServicesFound') }}</p>
         </template>
         <AppLauncherCard
           v-else
-          v-for="service in getCluster(selectedCluster).services"
+          v-for="service in sortedServices"
           :key="service.id"
           :cluster-id="selectedCluster"
           :service="service"
         />
+      </div>
+      <div v-else-if="selectedView === 'list'">
+        <SortableTable
+          :rows="sortedServices"
+          :headers="tableHeaders"
+          :row-key="'id'"
+          :search="true"
+          :table-actions="false"
+          :row-actions="false"
+          :no-rows-text="$store.getters['i18n/t']('appLauncher.noServicesFound')"
+        >
+          <template #cell:name="{row}">
+            {{ row.metadata.name }}
+          </template>
+        </SortableTable>
       </div>
     </div>
     <div v-else>
