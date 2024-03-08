@@ -1,6 +1,6 @@
 {
   "name": "krum-rancher-extensions-demo",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "engines": {
     "node": "16.19.1"
