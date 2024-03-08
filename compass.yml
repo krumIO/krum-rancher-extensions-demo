@@ -1,0 +1,23 @@
+name: krumIO/krum-rancher-extensions
+id: 'ari:cloud:compass:4ff0fee6-a638-4914-8d87-9dea1e98c502:component/74e8bfae-0237-4927-952f-393f8d06d82f/5b9fbacb-335a-480d-91cd-2d37466aa7b3'
+description: 'Imported from a GitHub repository linked to the Product: App Launcher Rancher Extension Jira Software project.'
+configVersion: 1
+typeId: SERVICE
+ownerId: 'ari:cloud:teams::team/955e7924-0a16-4c67-827b-58b158190141'
+fields:
+  lifecycle: Pre-release
+  tier: 4
+links:
+  - name: krumIO/krum-rancher-extensions
+    type: REPOSITORY
+    url: 'https://github.com/krumIO/krum-rancher-extensions'
+  - name: 'Product: App Launcher Rancher Extension'
+    type: PROJECT
+    url: 'https://krumtest.atlassian.net/browse/APPLAUNCHER'
+relationships: {}
+labels:
+  - jira-import
+customFields: null
+
+# Learn more about formatting compass.yml:
+# https://go.atlassian.com/compass-yml-format
