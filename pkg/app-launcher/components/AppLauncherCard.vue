@@ -109,6 +109,9 @@ export default {
           favoritedService.service.id === this.service.id
       );
     },
+    isGlobalApp() {
+      return this.service.metadata.annotations?.['extensions.applauncher/global-app'] === 'true';
+    },
   },
   name: 'AppLauncherCard',
   layout: 'plain',
@@ -143,22 +146,19 @@ export default {
       <p>{{ namespace }}/{{ name }}</p>
     </template>
     <template #actions>
-      <button class="icon-button" @click="toggleFavorite">
+      <button v-if="!isGlobalApp" class="icon-button" @click="toggleFavorite">
         <i :class="['icon', isFavorited ? 'icon-star' : 'icon-star-open']" />
       </button>
+      <i v-else class="icon icon-globe icon-only" />
       <a
         v-if="(endpoints?.length ?? 0) <= 1"
         :disabled="!endpoints?.length"
         :href="endpoints[0]?.value"
         target="_blank"
         rel="noopener noreferrer nofollow"
-        :title="
-          endpoints?.length === 0
-            ? t('appLauncher.noEndpointFoundForApp')
-            : t('appLauncher.launchEndpoint', {
-                endpoint: endpoints[0].label,
-              })
-        "
+        :title="endpoints?.length === 0 ? t('appLauncher.noEndpointFoundForApp') : t('appLauncher.launchEndpoint', {
+          endpoint: endpoints[0].label,
+        })"
         class="btn role-primary"
       >
         {{ t('appLauncher.launch') }}
@@ -185,5 +185,14 @@ export default {
   color: var(--primary);
   font-size: 1.8rem;
   margin-right: 1rem;
+}
+.icon-only {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin-right: 1rem;
+  margin-top: 0.5rem;
 }
 </style>

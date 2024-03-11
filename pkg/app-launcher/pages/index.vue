@@ -66,6 +66,25 @@ export default {
         this.selectedCluster = this.servicesByCluster[0].id;
       }
       this.generateClusterOptions();
+      console.log('servicesByCluster', this.servicesByCluster);
+
+      // Retrieve global apps based on annotations
+      this.servicesByCluster.forEach((cluster) => {
+        cluster.services.forEach((service) => {
+          if (service.metadata.annotations?.['extensions.applauncher/global-app'] === 'true') {
+            this.favoritedServices.push({
+              clusterId: cluster.id,
+              service,
+            });
+          }
+        });
+      });
+
+      // Retrieve favorites from localStorage
+      const storedFavorites = localStorage.getItem('favoritedServices');
+      if (storedFavorites) {
+        this.favoritedServices.push(...JSON.parse(storedFavorites));
+      }
     } catch (error) {
       console.error('Error fetching clusters', error);
     } finally {
@@ -119,7 +138,7 @@ export default {
     },
     generateClusterOptions() {
       this.clusterOptions = this.servicesByCluster.map((cluster) => ({
-        label: cluster.name,
+        label: cluster.name.slice(8),
         value: cluster.id,
       }));
     },
@@ -157,6 +176,8 @@ export default {
           service,
         });
       }
+      // Store updated favorites in localStorage
+      localStorage.setItem('favoritedServices', JSON.stringify(this.favoritedServices));
     },
     isFavorited(service, favoritedServices) {
       return favoritedServices.some(
