@@ -177,7 +177,7 @@ export default {
         });
       }
       // Store updated favorites in localStorage
-      localStorage.setItem('favoritedServices', JSON.stringify(this.favoritedServices));
+      localStorage.setItem('favoritedServices', JSON.stringify(this.favoritedServices.filter((s) => (s.service.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true'))));
     },
     isFavorited(service, favoritedServices) {
       return favoritedServices.some(

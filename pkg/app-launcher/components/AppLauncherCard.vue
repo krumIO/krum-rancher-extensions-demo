@@ -119,7 +119,7 @@ export default {
 </script>
 
 <template>
-  <Card :show-highlight-border="false" :sticky="true">
+  <Card class="app-launcher-card" :show-highlight-border="false" :sticky="true">
     <template #title>
       <div style="width: 100%">
         <p style="font-size: 1.2rem">
@@ -177,6 +177,12 @@ export default {
 <style lang="scss" scoped>
 @import "@shell/assets/styles/fonts/_icons.scss";
 
+.app-launcher-card {
+  ::v-deep .card-body {
+    overflow: hidden !important;
+  }
+}
+
 .icon-button {
   background: none;
   border: none;
@@ -186,6 +192,7 @@ export default {
   font-size: 1.8rem;
   margin-right: 1rem;
 }
+
 .icon-only {
   background: none;
   border: none;
