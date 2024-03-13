@@ -1,5 +1,7 @@
 plugin/app-launcher-0.1.17.umd.min.1.js
 plugin/app-launcher-0.1.17.umd.min.1.js.map
+plugin/app-launcher-0.1.17.umd.min.2.js
+plugin/app-launcher-0.1.17.umd.min.2.js.map
 plugin/app-launcher-0.1.17.umd.min.js
 plugin/app-launcher-0.1.17.umd.min.js.map
 plugin/fonts/icons.068811ed.ttf
