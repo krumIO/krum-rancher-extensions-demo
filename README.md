@@ -25,14 +25,6 @@ We use [corepack](https://nodejs.org/api/corepack.html) (comes with Node.js) to 
 corepack enable
 ```
 
-## Usage
-
-- To run the dev instance pointing at any given rancher installation locally you can use `API=<your rancher URI> yarn dev`
-- Global apps will show at the top as a combination of global apps defined by cluster YAML files and user-selected favorites
- *note: global apps can be set by modifying the service's `metadata.annotations['extensions.applauncher/global-app']` to 'true'
-- Select different clusters to view the services of. Global Apps perisist across all views.
-- The view can be changed with the view buttons from grid to list views.
-
 ## Misc
 
 For more info, refer to the [rancher extensions prerequisites](https://rancher.github.io/dashboard/extensions/extensions-getting-started#prerequisites).
