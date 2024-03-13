@@ -1,5 +1,11 @@
 <h1 align="center">Krum Rancher Extensions Demo</h1>
 
+The App Launcher is intended to fill a large gap in functionality for non-operator users of Rancher.  Currently, if a user wants to access a software application running in Rancher/kubernetes, they need to dig deep into the services/ingress section in Rancher, or learn how to build the proxy URL or on their own. Otherwise, operators need to use an ingress to create convenient access for users.
+
+However, the proxy URL can be a powerful tool in Rancher. It allows a user with appropriate access to a namespaced resource to access that resource/application without ingress. 
+
+The App Launcher will expose a top-level directory of service/ingress objects, and pre-build proxy URLs. It will also provide an option to launch that ingress, if available.
+
 ## Setup
 
 ### Node
@@ -19,6 +25,6 @@ We use [corepack](https://nodejs.org/api/corepack.html) (comes with Node.js) to 
 corepack enable
 ```
 
-### Misc
+## Misc
 
 For more info, refer to the [rancher extensions prerequisites](https://rancher.github.io/dashboard/extensions/extensions-getting-started#prerequisites).

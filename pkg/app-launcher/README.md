@@ -5,12 +5,18 @@ Rancher App Launcher Extension is a powerful tool for improved accessibility and
 ## How to Run
 
 1. Clone this repository to your machine.
-2. Install the npm dependencies using the command "yarn install".
-3. Run the extension with the command "API=<Rancher Backend URL> yarn dev".
+2. Install the npm dependencies using the command `yarn install`.
+3. Run the extension locally with the command `API=<Rancher Backend URL> yarn dev`.
 
 ## Usage
 
-Once the Rancher App Launcher Extension is installed, you can access a unified resource page from the main dashboard. This page showcases cards for each discovered service, allowing you to conveniently open the service with a simple click. The extension is designed to improve discoverability, and offer a straightforward way to navigate the complexities of multi-cluster environments.
+- Once the Rancher App Launcher Extension is installed, you can access a unified resource page from the main dashboard.
+- This page showcases cards for each discovered service and ingress, allowing you to conveniently open the service with a simple click.
+    *The extension is designed to improve discoverability, and offer a straightforward way to navigate the complexities of multi-cluster environments.*
+- Global apps will show at the top as a combination of global apps defined by cluster YAML files and user-selected favorites
+    *\*note: global apps can be set by modifying the service's `metadata.annotations['extensions.applauncher/global-app']` to 'true'*
+- Select different clusters to view the services of. Global Apps perisist across all views.
+- The view can be changed with the view buttons from grid to list views.
 
 ## Contribution
 

@@ -4,6 +4,7 @@ import Loading from '@shell/components/Loading';
 import SortableTable from '@shell/components/SortableTable';
 import ButtonDropDown from '@shell/components/ButtonDropdown';
 import { isMaybeSecure } from '@shell/utils/url';
+import { ingressFullPath } from '@shell/models/networking.k8s.io.ingress';
 
 import AppLauncherCard from '../components/AppLauncherCard.vue';
 
@@ -17,7 +18,7 @@ export default {
   data() {
     return {
       servicesByCluster: [],
-      mockServicesByCluster: [],
+      ingressesByCluster: [],
       clusterLoading: {},
       loading: true,
       selectedCluster: null,
@@ -59,13 +60,38 @@ export default {
   async mounted() {
     try {
       const allClusters = await this.getClusters();
+      console.log('allClusters', allClusters);
       this.servicesByCluster = await this.getServicesByCluster(allClusters);
+      this.ingressesByCluster = await this.getIngressesByCluster(allClusters);
+
+      console.log('servicesByCluster', this.servicesByCluster);
+      console.log('ingressesByCluster', this.ingressesByCluster);
+
+      console.log("ingress path", ingressFullPath(this.ingressesByCluster[1].ingresses[0], this.ingressesByCluster[1].ingresses[0].spec.rules?.[0]));
 
       // Set the first cluster as the selected cluster
       if (this.servicesByCluster.length > 0) {
         this.selectedCluster = this.servicesByCluster[0].id;
       }
       this.generateClusterOptions();
+
+      // Retrieve global apps based on annotations
+      this.servicesByCluster.forEach((cluster) => {
+        cluster.services.forEach((service) => {
+          if (service.metadata?.annotations?.['extensions.applauncher/global-app'] === 'true') {
+            this.favoritedServices.push({
+              clusterId: cluster.id,
+              service,
+            });
+          }
+        });
+      });
+
+      // Retrieve favorites from localStorage
+      const storedFavorites = localStorage.getItem('favoritedServices');
+      if (storedFavorites) {
+        this.favoritedServices.push(...JSON.parse(storedFavorites));
+      }
     } catch (error) {
       console.error('Error fetching clusters', error);
     } finally {
@@ -74,12 +100,10 @@ export default {
   },
   methods: {
     async getClusters() {
+      console.log('this.$store', this.$store);
       return await this.$store.dispatch(`management/findAll`, {
         type: MANAGEMENT.CLUSTER,
       });
-    },
-    async getMockServicesByCluster() {
-      return await Promise.resolve(mockServicesByCluster);
     },
     getClusterName(clusterId) {
       const cluster = this.servicesByCluster.find(c => c.id === clusterId);
@@ -94,7 +118,7 @@ export default {
           .filter((cluster) => cluster.isReady)
           .map(async (cluster) => {
             const clusterData = {
-              name: `${this.$store.getters['i18n/t']('nav.group.cluster')} ${cluster.spec.displayName}`,
+              name: cluster.spec.displayName,
               id: cluster.id,
               services: [],
               loading: true,
@@ -109,6 +133,35 @@ export default {
               clusterData.services = services;
             } catch (error) {
               console.error(`Error fetching services for cluster ${cluster.id}:`, error);
+              clusterData.error = true;
+            } finally {
+              clusterData.loading = false;
+            }
+            return clusterData;
+          })
+      );
+    },
+    async getIngressesByCluster(allClusters) {
+      return Promise.all(
+        allClusters
+          .filter((cluster) => cluster.isReady)
+          .map(async (cluster) => {
+            const clusterData = {
+              name: cluster.spec.displayName,
+              id: cluster.id,
+              ingresses: [],
+              loading: true,
+              error: false,
+            };
+            try {
+              const ingresses = (
+                await this.$store.dispatch('cluster/request', {
+                  url: `/k8s/clusters/${cluster.id}/v1/networking.k8s.io.ingresses`,
+                })
+              ).data;
+              clusterData.ingresses = ingresses;
+            } catch (error) {
+              console.error(`Error fetching ingresses for cluster ${cluster.id}:`, error);
               clusterData.error = true;
             } finally {
               clusterData.loading = false;
@@ -157,6 +210,8 @@ export default {
           service,
         });
       }
+      // Store updated favorites in localStorage
+      localStorage.setItem('favoritedServices', JSON.stringify(this.favoritedServices.filter((s) => (s.service.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true'))));
     },
     isFavorited(service, favoritedServices) {
       return favoritedServices.some(
@@ -168,7 +223,59 @@ export default {
   },
   computed: {
     selectedClusterData() {
-      return this.getCluster(this.selectedCluster);
+      const cluster = this.getCluster(this.selectedCluster);
+      if (cluster) {
+        const ingresses = this.ingressesByCluster.find(
+          (ingressCluster) => ingressCluster.id === cluster.id
+        )?.ingresses || [];
+
+        const services = cluster.services.map((service) => {
+          const relatedIngress = ingresses.find((ingress) =>
+            ingress.spec.rules.some((rule) =>
+              rule.http.paths.some((path) =>
+                path.backend.service?.name === service.metadata.name
+              )
+            )
+          );
+          return {
+            ...service,
+            relatedIngress,
+          };
+        });
+
+        return {
+          ...cluster,
+          services,
+          ingresses,
+        };
+      }
+      return null;
+    },
+    sortedApps() {
+      if (this.selectedClusterData) {
+        const services = this.selectedClusterData.services.map((service) => ({
+          ...service,
+          type: 'service',
+          uniqueId: `service-${service.id}`,
+        }));
+
+        const ingresses = this.selectedClusterData.ingresses.map((ingress) => ({
+          ...ingress,
+          type: 'ingress',
+          uniqueId: `ingress-${ingress.id}`,
+        }));
+
+        return [...services, ...ingresses].sort((a, b) => {
+          const nameA = a.metadata.name.toLowerCase();
+          const nameB = b.metadata.name.toLowerCase();
+          if (this.tableHeaders[0].sortOrder === 'asc') {
+            return nameA.localeCompare(nameB);
+          } else {
+            return nameB.localeCompare(nameA);
+          }
+        });
+      }
+      return [];
     },
     sortedServices() {
       if (this.selectedClusterData) {
@@ -232,14 +339,22 @@ export default {
           <p>{{ $store.getters['i18n/t']('appLauncher.noServicesFound') }}</p>
         </template>
         <AppLauncherCard
-          v-else
-          v-for="service in sortedServices"
-          :key="service.id"
+          v-for="app in sortedApps"
+          :key="app.uniqueId"
           :cluster-id="selectedCluster"
-          :service="service"
+          :service="app.type === 'service' ? app : null"
+          :ingress="app.type === 'ingress' ? app : null"
           :favorited-services="favoritedServices"
           @toggle-favorite="toggleFavorite"
         />
+        <!-- <AppLauncherCard
+          v-for="ingress in selectedClusterData.ingresses"
+          :key="ingress.id"
+          :cluster-id="selectedCluster"
+          :ingress="ingress"
+          :favorited-services="favoritedServices"
+          @toggle-favorite="toggleFavorite"
+        /> -->
       </div>
       <div v-else-if="selectedView === 'list'">
         <SortableTable
