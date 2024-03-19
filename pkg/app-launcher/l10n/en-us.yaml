@@ -11,3 +11,4 @@ appLauncher:
   loadingServices: Loading services...
   selectCluster: Select a cluster
   globalApps: Global Apps
+  filter: Filter
