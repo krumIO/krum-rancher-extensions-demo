@@ -1,0 +1,19 @@
+{
+  "name": "app-launcher",
+  "description": "App Launcher plugin for Rancher",
+  "version": "0.1.19",
+  "private": false,
+  "rancher": true,
+  "engines": {
+    "node": ">=12"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "4.5.18",
+    "@vue/cli-service": "4.5.18",
+    "@vue/cli-plugin-typescript": "4.5.18"
+  },
+  "files": [
+    "**/*"
+  ],
+  "main": "app-launcher-0.1.19.umd.min.js"
+}
