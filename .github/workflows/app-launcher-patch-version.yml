@@ -1,0 +1,32 @@
+name: Patch App-Launcher Version
+on:
+  # push:
+  #   branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: 'Patch Version'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      # Install Node.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Patch version
+        working-directory: ./pkg/app-launcher
+        run: |
+          npm version patch --no-git-tag-version
+      - name: Commit
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "actions-user"
+          git commit -am "Auto updated version" && git push || echo "No changes to commit"
