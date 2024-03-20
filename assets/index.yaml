@@ -12,9 +12,9 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.18
-    created: "2024-03-18T13:20:09.931776397Z"
+    created: "2024-03-20T17:40:45.120960529Z"
     description: App Launcher plugin for Rancher
-    digest: cd24a3cdcb8511b7d18a5e5a4f32907c9e2b72c0df25af3be06468ecb257a8c1
+    digest: 4d072af0694f315af73fcfbf75daeec2fba308a4818e26b4d6121b9ab969e922
     name: app-launcher
     type: application
     urls:
@@ -359,9 +359,9 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.2
-    created: "2024-03-18T13:20:09.932056479Z"
+    created: "2024-03-20T17:40:45.121186341Z"
     description: pirate-locale plugin
-    digest: e50da56a437847c6326ca5cce71e1afccc9417ea4be1a89412e4864c818cdd11
+    digest: b28442c4b92913d1fcf92cdd143433d121842f89d9d44059575ec57ea0a35d9c
     name: pirate-locale
     type: application
     urls:
@@ -386,4 +386,4 @@ entries:
     urls:
     - assets/pirate-locale/pirate-locale-0.1.1.tgz
     version: 0.1.1
-generated: "2024-03-18T13:20:09.931360952Z"
+generated: "2024-03-20T17:40:45.120615043Z"
