@@ -25,6 +25,7 @@ export default {
       clusterOptions: [],
       selectedView: 'grid',
       favoritedServices: [],
+      searchQuery: '',
       tableHeaders: [
         {
           name: 'name',
@@ -60,14 +61,8 @@ export default {
   async mounted() {
     try {
       const allClusters = await this.getClusters();
-      console.log('allClusters', allClusters);
       this.servicesByCluster = await this.getServicesByCluster(allClusters);
       this.ingressesByCluster = await this.getIngressesByCluster(allClusters);
-
-      console.log('servicesByCluster', this.servicesByCluster);
-      console.log('ingressesByCluster', this.ingressesByCluster);
-
-      console.log("ingress path", ingressFullPath(this.ingressesByCluster[1].ingresses[0], this.ingressesByCluster[1].ingresses[0].spec.rules?.[0]));
 
       // Set the first cluster as the selected cluster
       if (this.servicesByCluster.length > 0) {
@@ -100,7 +95,6 @@ export default {
   },
   methods: {
     async getClusters() {
-      console.log('this.$store', this.$store);
       return await this.$store.dispatch(`management/findAll`, {
         type: MANAGEMENT.CLUSTER,
       });
@@ -277,6 +271,20 @@ export default {
       }
       return [];
     },
+    filteredApps() {
+      if (this.searchQuery.trim() === '') {
+        return this.sortedApps;
+      } else {
+        const searchTerm = this.searchQuery.trim().toLowerCase();
+        return this.sortedApps.filter(app => {
+          return (app.metadata.name.toLowerCase().includes(searchTerm) ||
+            app.metadata.namespace.toLowerCase().includes(searchTerm) ||
+            app.metadata.labels?.['app.kubernetes.io/version']?.toLowerCase().includes(searchTerm) ||
+            app.metadata.labels?.['helm.sh/chart']?.toLowerCase().includes(searchTerm) ||
+            app.metadata.fields.includes(searchTerm));
+        });
+      }
+    },
     sortedServices() {
       if (this.selectedClusterData) {
         return [...this.selectedClusterData.services].sort((a, b) => {
@@ -334,27 +342,25 @@ export default {
       </div>
     </div>
     <div v-if="selectedCluster">
-      <div v-if="selectedView === 'grid'" class="services-by-cluster-grid">
-        <template v-if="sortedServices.length === 0">
-          <p>{{ $store.getters['i18n/t']('appLauncher.noServicesFound') }}</p>
-        </template>
-        <AppLauncherCard
-          v-for="app in sortedApps"
-          :key="app.uniqueId"
-          :cluster-id="selectedCluster"
-          :service="app.type === 'service' ? app : null"
-          :ingress="app.type === 'ingress' ? app : null"
-          :favorited-services="favoritedServices"
-          @toggle-favorite="toggleFavorite"
-        />
-        <!-- <AppLauncherCard
-          v-for="ingress in selectedClusterData.ingresses"
-          :key="ingress.id"
-          :cluster-id="selectedCluster"
-          :ingress="ingress"
-          :favorited-services="favoritedServices"
-          @toggle-favorite="toggleFavorite"
-        /> -->
+      <div v-if="selectedView === 'grid'">
+        <div class="search-input">
+          <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
+        </div>
+        <div class="services-by-cluster-grid">
+          <template v-if="filteredApps.length === 0">
+            <p>{{ $store.getters['i18n/t']('appLauncher.noAppsFound') }}</p>
+          </template>
+          <AppLauncherCard
+            v-else
+            v-for="app in filteredApps"
+            :key="app.uniqueId"
+            :cluster-id="selectedCluster"
+            :service="app.type === 'service' ? app : null"
+            :ingress="app.type === 'ingress' ? app : null"
+            :favorited-services="favoritedServices"
+            @toggle-favorite="toggleFavorite"
+          />
+        </div>
       </div>
       <div v-else-if="selectedView === 'list'">
         <SortableTable
@@ -453,5 +459,20 @@ export default {
 
 .icon-button:hover {
   color: var(--primary-hover);
+}
+
+.search-input {
+  margin-bottom: 1rem;
+  text-align: right;
+  justify-content: flex-end;
+  display: flex;
+
+  input {
+    width: 190px;
+    padding: 11px;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
 }
 </style>
