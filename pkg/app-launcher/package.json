@@ -1,9 +1,15 @@
 {
   "name": "app-launcher",
   "description": "App Launcher plugin for Rancher",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "private": false,
-  "rancher": true,
+  "rancher": {
+    "annotations": {
+      "catalog.cattle.io/rancher-version": ">= v2.7.9",
+      "catalog.cattle.io/kube-version": ">= v1.16.0-0 < v1.29.0-0",
+	    "catalog.cattle.io/display-name": "Krum Platform Tools: App Launcher"
+    }
+  },
   "scripts": {
     "dev": "./node_modules/.bin/nuxt dev",
     "nuxt": "./node_modules/.bin/nuxt"
