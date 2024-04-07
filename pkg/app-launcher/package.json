@@ -1,7 +1,7 @@
 {
   "name": "app-launcher",
   "description": "App Launcher plugin for Rancher",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "private": false,
   "rancher": {
     "annotations": {
@@ -10,6 +10,7 @@
 	    "catalog.cattle.io/display-name": "Krum Platform Tools: App Launcher"
     }
   },
+  "icon": "https://raw.githubusercontent.com/krumIO/krum-rancher-extensions/main/pkg/app-launcher/icon.svg",
   "scripts": {
     "dev": "./node_modules/.bin/nuxt dev",
     "nuxt": "./node_modules/.bin/nuxt"
