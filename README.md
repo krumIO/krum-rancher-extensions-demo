@@ -25,6 +25,21 @@ We use [corepack](https://nodejs.org/api/corepack.html) (comes with Node.js) to 
 corepack enable
 ```
 
+## Troubleshooting
+
+### OpenSSL Error
+
+You may encounter an error that appears like the following:
+    
+```   
+  opensslErrorStack: [ 'error:03000086:digital envelope routines::initialization error' ],
+  library: 'digital envelope routines',
+  reason: 'unsupported',
+  code: 'ERR_OSSL_EVP_UNSUPPORTED' }
+```
+
+If so, make sure you are using node 16. Those with NVM can use the following command to switch to node 16: `nvm use 16`.
+
 ## Misc
 
 For more info, refer to the [rancher extensions prerequisites](https://rancher.github.io/dashboard/extensions/extensions-getting-started#prerequisites).
