@@ -91,7 +91,7 @@ export default {
 </script>
 
 <template>
-  <Card class="app-launcher-card" :show-highlight-border="false" :sticky="true">
+  <Card class="app-launcher-card" :show-highlight-border="false" :sticky="true" v-if="app">
     <template #title>
       <div style="width: 100%">
         <p style="font-size: 1.2rem">

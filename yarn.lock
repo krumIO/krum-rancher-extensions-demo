@@ -14901,9 +14901,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"krum-rancher-extensions-demo@workspace:.":
+"krum-rancher-extensions@workspace:.":
   version: 0.0.0-use.local
-  resolution: "krum-rancher-extensions-demo@workspace:."
+  resolution: "krum-rancher-extensions@workspace:."
   dependencies:
     "@babel/plugin-proposal-private-property-in-object": ^7.21.11
     "@rancher/components": 0.1.3
