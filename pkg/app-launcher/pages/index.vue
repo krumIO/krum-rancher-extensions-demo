@@ -66,7 +66,7 @@ export default {
 
       // Set the first cluster as the selected cluster
       if (this.servicesByCluster.length > 0) {
-        this.selectedCluster = this.servicesByCluster[0].id;
+        this.selectedCluster = "ALL_CLUSTERS";
       }
       this.generateClusterOptions();
 
@@ -165,10 +165,10 @@ export default {
       );
     },
     generateClusterOptions() {
-      this.clusterOptions = this.servicesByCluster.map((cluster) => ({
+      this.clusterOptions = [{ label: 'All Clusters', value: 'ALL_CLUSTERS' }, ...this.servicesByCluster.map(cluster => ({
         label: cluster.name,
         value: cluster.id,
-      }));
+      }))];
     },
     toggleSortOrder() {
       this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
@@ -236,12 +236,6 @@ export default {
             relatedIngress,
           };
         });
-
-        // return {
-        //   ...cluster,
-        //   services,
-        //   ingresses,
-        // };
         
         const filteredApps = this.filteredApps(services, ingresses);
 
@@ -253,6 +247,17 @@ export default {
         };
       }
       return null;
+    },
+    displayedClusterData() {
+      if (this.selectedCluster === 'ALL_CLUSTERS') {
+        return this.servicesByCluster.map(cluster => ({
+          ...cluster,
+          ingresses: this.ingressesByCluster.find(ingressCluster => ingressCluster.id === cluster.id)?.ingresses || [],
+          filteredApps: this.filteredApps(cluster.services, this.ingressesByCluster.find(ingressCluster => ingressCluster.id === cluster.id)?.ingresses || []),
+        }));
+      } else {
+        return [this.selectedClusterData]; // This just remakes use of selectedClusterData for single cluster view
+      }
     },
     sortedApps() {
       if (this.selectedClusterData) {
@@ -327,31 +332,31 @@ export default {
 
 <template>
   <Loading v-if="loading" :label="$store.getters['i18n/t']('appLauncher.loading')" />
-  <div v-else>
+  <div v-else class="main-container">
+    <div class="cluster-actions">
+      <div class="search-input">
+        <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
+      </div>
+      <button class="icon-button" @click="toggleSortOrder" v-if="selectedView === 'grid'">
+        <i class="icon icon-sort" />
+      </button>
+      <div class="select-wrapper">
+        <select v-model="selectedCluster" class="cluster-select">
+          <option v-for="option in clusterOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+      <button class="icon-button" @click="selectedView = 'grid'">
+        <i class="icon icon-apps" />
+      </button>
+      <button class="icon-button" @click="selectedView = 'list'">
+        <i class="icon icon-list-flat" />
+      </button>
+    </div>
     <div v-if="favoritedServices.length > 0">
       <div class="cluster-header">
         <h2>{{ t('appLauncher.globalApps') }}</h2>
-        <div class="cluster-actions">
-          <div class="search-input">
-            <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
-          </div>
-          <button class="icon-button" @click="toggleSortOrder" v-if="selectedView === 'grid'">
-            <i class="icon icon-sort" />
-          </button>
-          <div class="select-wrapper">
-            <select v-model="selectedCluster" class="cluster-select">
-              <option v-for="option in clusterOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-          </div>
-          <button class="icon-button" @click="selectedView = 'grid'">
-            <i class="icon icon-apps" />
-          </button>
-          <button class="icon-button" @click="selectedView = 'list'">
-            <i class="icon icon-list-flat" />
-          </button>
-        </div>
       </div>
       <div class="services-by-cluster-grid">
         <AppLauncherCard v-for="favoritedService in favoritedServices"
@@ -360,63 +365,70 @@ export default {
           @toggle-favorite="toggleFavorite" />
       </div>
     </div>
-    <div class="cluster-header">
-      <h1>
-        {{ selectedCluster ? getClusterName(selectedCluster) : $store.getters['i18n/t']('appLauncher.selectCluster') }}
-      </h1>
-    </div>
     <div v-if="selectedCluster">
       <div v-if="selectedView === 'grid'">
-        <div class="services-by-cluster-grid">
-          <p v-if="selectedClusterData.filteredApps.length === 0">{{ $store.getters['i18n/t']('appLauncher.noAppsFound') }}</p>
-          <AppLauncherCard
-            v-if="selectedClusterData.filteredApps.length !== 0"
-            v-for="app in selectedClusterData.filteredApps"
-            :key="app.uniqueId"
-            :cluster-id="selectedCluster"
-            :service="app.type === 'service' ? app : null"
-            :ingress="app.type === 'ingress' ? app : null"
-            :favorited-services="favoritedServices"
-            @toggle-favorite="toggleFavorite"
-          />
+        <div v-for="clusterData in displayedClusterData" :key="clusterData.id">
+          <div class="cluster-header">
+            <h1>
+              {{ clusterData.name }}
+            </h1>
+          </div>
+          <div class="services-by-cluster-grid">
+            <AppLauncherCard
+              v-for="app in clusterData.filteredApps"
+              :key="app.uniqueId"
+              :cluster-id="clusterData.id"
+              :service="app.type === 'service' ? app : null"
+              :ingress="app.type === 'ingress' ? app : null"
+              :favorited-services="favoritedServices"
+              @toggle-favorite="toggleFavorite"
+            />
+          </div>
         </div>
       </div>
       <div v-else-if="selectedView === 'list'">
-        <SortableTable
-          :rows="selectedClusterData.filteredApps"
-          :headers="tableHeaders"
-          :row-key="'uniqueId'"
-          :search="false"
-          :table-actions="false"
-          :row-actions="false"
-          :no-rows-text="$store.getters['i18n/t']('appLauncher.noAppsFound')"
-        >
-          <template #cell:name="{row}">
-            {{ row.metadata.name }}
-          </template>
-          <template #cell:namespace="{row}">
-            {{ row.metadata.namespace }}
-          </template>
-          <template #cell:version="{row}">
-            {{ row.metadata.labels?.['app.kubernetes.io/version'] }}
-          </template>
-          <template #cell:helmChart="{row}">
-            {{ row.metadata.labels?.['helm.sh/chart'] }}
-          </template>
-          <template #cell:actions="{row}">
-            <div style="display: flex; justify-content: flex-end;">
-              <button class="icon-button favorite-icon" @click="toggleFavorite(row)">
-                <i :class="['icon', isFavorited(row, favoritedServices) ? 'icon-star' : 'icon-star-open']" />
-              </button>
-              <a v-if="getEndpoints(row)?.length <= 1" :href="getEndpoints(row)[0]?.value" target="_blank"
-                rel="noopener noreferrer nofollow" class="btn role-primary">
-                {{ t('appLauncher.launch') }}
-              </a>
-              <ButtonDropDown v-else :button-label="t('appLauncher.launch')" :dropdown-options="getEndpoints(row)"
-                :title="t('appLauncher.launchAnEndpointFromSelection')" @click-action="(o) => openLink(o.value)" />
-            </div>
-          </template>
-        </SortableTable>
+        <div v-for="clusterData in displayedClusterData" :key="clusterData.id">
+          <div class="cluster-header">
+            <h1>
+              {{ clusterData.name }}
+            </h1>
+          </div>
+          <SortableTable
+            :rows="clusterData.filteredApps"
+            :headers="tableHeaders"
+            :row-key="'uniqueId'"
+            :search="false"
+            :table-actions="false"
+            :row-actions="false"
+            :no-rows-text="$store.getters['i18n/t']('appLauncher.noAppsFound')"
+          >
+            <template #cell:name="{row}">
+              {{ row.metadata.name }}
+            </template>
+            <template #cell:namespace="{row}">
+              {{ row.metadata.namespace }}
+            </template>
+            <template #cell:version="{row}">
+              {{ row.metadata.labels?.['app.kubernetes.io/version'] }}
+            </template>
+            <template #cell:helmChart="{row}">
+              {{ row.metadata.labels?.['helm.sh/chart'] }}
+            </template>
+            <template #cell:actions="{row}">
+              <div style="display: flex; justify-content: flex-end;">
+                <button class="icon-button favorite-icon" @click="toggleFavorite(row)">
+                  <i :class="['icon', isFavorited(row, favoritedServices) ? 'icon-star' : 'icon-star-open']" />
+                </button>
+                <a v-if="getEndpoints(row)?.length <= 1" :href="getEndpoints(row)[0]?.value" target="_blank"
+                  rel="noopener noreferrer nofollow" class="btn role-primary">
+                  {{ t('appLauncher.launch') }}
+                </a>
+                <ButtonDropDown v-else :button-label="t('appLauncher.launch')" :dropdown-options="getEndpoints(row)"
+                  :title="t('appLauncher.launchAnEndpointFromSelection')" @click-action="(o) => openLink(o.value)" />
+              </div>
+            </template>
+          </SortableTable>
+        </div>
       </div>
     </div>
     <div v-else>
@@ -428,6 +440,10 @@ export default {
 <style lang="scss" scoped>
 @import "@shell/assets/styles/fonts/_icons.scss";
 
+.main-container {
+  margin-top: -2.425rem;
+}
+
 .services-by-cluster-grid {
   display: grid;
   grid-gap: 1rem;
@@ -438,7 +454,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
   background: var(--header-bg);
   border-bottom: var(--header-border-size) solid var(--header-border);
   height: var(--header-height);
@@ -451,6 +467,14 @@ export default {
   display: flex;
   align-items: center;
   gap: 1rem;
+  position: fixed;
+  right: 6rem;
+  top: 4.4rem;
+  z-index: 2;
+  padding-bottom: 0.425rem;
+  padding-right: 4.4rem;
+  background: rgb(27, 28, 33);
+  border-bottom: var(--header-border-size) solid var(--header-border);
 }
 
 .icon-button {
