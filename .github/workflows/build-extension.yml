@@ -47,8 +47,9 @@ jobs:
       - run: corepack enable
 
       - name: Setup Nodejs with yarn caching
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
+          node-version: '16'
           cache: yarn
           node-version-file: package.json
 
