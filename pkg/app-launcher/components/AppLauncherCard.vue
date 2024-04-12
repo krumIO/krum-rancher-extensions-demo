@@ -14,6 +14,10 @@ export default {
       type: String,
       required: true,
     },
+    clusterName: {
+      type: String,
+      required: false,
+    },
     favoritedServices: {
       type: Array,
       required: true,
@@ -26,29 +30,48 @@ export default {
       type: Object,
       default: null,
     },
+    metadata: {
+      type: Object,
+      default: null,
+    },
   },
   methods: {
     openLink(link) {
       window.open(link);
     },
     toggleFavorite() {
-      this.$emit('toggle-favorite', this.service);
+      this.$emit('toggle-favorite', this.app)
     },
   },
   computed: {
     app() {
-      return this.service || this.ingress;
+      if (this.service) {
+        return {
+          ...this.service,
+          kind: 'Service',
+          clusterId: this.clusterId,
+          clusterName: this.clusterName
+        };
+      } else if (this.ingress) {
+        return {
+          ...this.ingress,
+          kind: 'Ingress',
+          clusterId: this.clusterId,
+          clusterName: this.clusterName
+        };
+      }
+      return null;
     },
     endpoints() {
       return (
         this.service?.spec?.ports?.map((port) => {
           const endpoint = `${
             isMaybeSecure(port.port, port.protocol) ? 'https' : 'http'
-          }:${this.service?.metadata?.name}:${port.port}`;
+          }:${this.app.metadata?.name}:${port.port}`;
 
           return {
             label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
-            value: `/k8s/clusters/${this.clusterId}/api/v1/namespaces/${this.service.metadata.namespace}/services/${endpoint}/proxy`,
+            value: `/k8s/clusters/${this.clusterId}/api/v1/namespaces/${this.service.namespace}/services/${endpoint}/proxy`,
           };
         }) ?? []
       );
@@ -56,30 +79,30 @@ export default {
     computedServiceName() {
       return (
         this.service?.metadata?.labels?.['app.kubernetes.io/component'] ??
-        this.service?.metadata?.name
+        this.serice?.metadata?.name
       );
     },
     helmChart() {
-      return this.service?.metadata?.labels?.['helm.sh/chart'];
+      return this.app?.metadata?.labels?.['helm.sh/chart'];
     },
     kubernetesVersion() {
-      return this.service?.metadata?.labels?.['app.kubernetes.io/version'];
+      return this.app?.metadata?.labels?.['app.kubernetes.io/version'];
     },
     name() {
-      return this.service?.metadata?.name;
+      return this.app?.metadata?.name;
     },
     namespace() {
-      return this.service?.metadata?.namespace;
+      return this.app?.metadata?.namespace;
     },
     isFavorited() {
       return this.favoritedServices.some(
         (favoritedService) =>
-          favoritedService?.clusterId === this.clusterId &&
-          favoritedService?.service?.id === this.service?.id
+          favoritedService?.app?.id === this.app?.id &&
+          favoritedService?.app?.kind === this.app?.kind
       );
     },
     isGlobalApp() {
-      return this.service?.metadata?.annotations?.['extensions.applauncher/global-app'] === 'true';
+      return this.app?.metadata?.annotations?.['extensions.applauncher/global-app'] === 'true';
     },
     ingressPath() {
       return ingressFullPath(this.ingress, this.ingress?.spec?.rules?.[0]);
@@ -98,21 +121,25 @@ export default {
           {{ service ? service?.metadata?.name : ingress?.metadata?.name }}
         </p>
         <div style="color: var(--input-label); display: flex; justify-content: space-between; margin-top: 4px;">
-          <p v-if="app.type === 'service' && app.metadata?.labels?.['app.kubernetes.io/version'] !== undefined">
+          <p v-if="app.kind === 'Service' && app.metadata?.labels?.['app.kubernetes.io/version'] !== undefined">
             {{ kubernetesVersion }}
           </p>
-          <p v-if="app.type === 'service' && app.metadata?.labels?.['helm.sh/chart'] !== undefined">
+          <p v-if="app.kind === 'Service' && app.metadata?.labels?.['helm.sh/chart'] !== undefined">
             {{ helmChart }}
           </p>
-          <p v-if="app.type === 'ingress'">
+          <p v-if="app.kind === 'Ingress'">
             Ingress
           </p>
         </div>
       </div>
     </template>
     <template #body>
-      <p v-if="app.type === 'service'">{{ namespace }}/{{ name }}</p>
-      <p v-if="app.type === 'ingress'">{{ ingressPath }}</p>
+      <p v-if="app.kind === 'Service'">
+        {{ isGlobalApp || isFavorited ? `${clusterName}` : '' }}/{{ namespace }}/{{ name }}
+      </p>
+      <p v-if="app.Kind === 'Ingress'">
+        {{ isGlobalApp || isFavorited ? `${clusterName}` : '' }}/{{ ingressPath }}
+      </p>
     </template>
     <template #actions>
       <button v-if="!isGlobalApp" class="icon-button" @click="toggleFavorite">

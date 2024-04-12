@@ -24,7 +24,7 @@ export default {
       selectedCluster: null,
       clusterOptions: [],
       selectedView: 'grid',
-      favoritedServices: [],
+      favoritedApps: [],
       searchQuery: '',
       tableHeaders: [
         {
@@ -70,22 +70,34 @@ export default {
       }
       this.generateClusterOptions();
 
-      // Retrieve global apps based on annotations
+      // Retrieve global services based on annotations
       this.servicesByCluster.forEach((cluster) => {
         cluster.services.forEach((service) => {
           if (service.metadata?.annotations?.['extensions.applauncher/global-app'] === 'true') {
-            this.favoritedServices.push({
+            this.favoritedApps.push({
               clusterId: cluster.id,
-              service,
+              app: service,
+            });
+          }
+        });
+      });
+
+      // Retrieve global ingresses based on annotations
+      this.ingressesByCluster.forEach((cluster) => {
+        cluster.ingresses.forEach((ingress) => {
+          if (ingress.metadata?.annotations?.['extensions.applauncher/global-app'] === 'true') {
+            this.favoritedApps.push({
+              clusterId: cluster.id,
+              app: ingress,
             });
           }
         });
       });
 
       // Retrieve favorites from localStorage
-      const storedFavorites = localStorage.getItem('favoritedServices');
+      const storedFavorites = localStorage.getItem('favoritedApps');
       if (storedFavorites) {
-        this.favoritedServices.push(...JSON.parse(storedFavorites));
+        this.favoritedApps.push(...JSON.parse(storedFavorites));
       }
     } catch (error) {
       console.error('Error fetching clusters', error);
@@ -104,7 +116,7 @@ export default {
       return cluster ? cluster.name : '';
     },
     getCluster(clusterId) {
-      return this.servicesByCluster.find(c => c.id === clusterId);
+      return this.servicesByCluster.find(c => c.id === clusterId) || null;
     },
     async getServicesByCluster(allClusters) {
       return await Promise.all(
@@ -190,28 +202,30 @@ export default {
     openLink(link) {
       window.open(link, '_blank');
     },
-    toggleFavorite(service) {
-      const index = this.favoritedServices.findIndex(
-        (favoritedService) =>
-          favoritedService.clusterId === this.selectedCluster &&
-          favoritedService.service.id === service.id
+    toggleFavorite(item) {
+      const index = this.favoritedApps.findIndex(
+        (favoritedApp) =>
+          favoritedApp.app.id === item.id &&
+          favoritedApp.app.kind === item.kind
       );
+      
       if (index !== -1) {
-        this.favoritedServices.splice(index, 1);
+        this.favoritedApps.splice(index, 1);
       } else {
-        this.favoritedServices.push({
-          clusterId: this.selectedCluster,
-          service,
+        this.favoritedApps.push({
+          clusterId: item.clusterId,
+          app: item,
         });
       }
+
       // Store updated favorites in localStorage
-      localStorage.setItem('favoritedServices', JSON.stringify(this.favoritedServices.filter((s) => (s.service.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true'))));
+      const favsToStore = JSON.stringify(this.favoritedApps.filter((item) => (item.app.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true')));
+      localStorage.setItem('favoritedApps', favsToStore);
     },
-    isFavorited(service, favoritedServices) {
-      return favoritedServices.some(
+    isFavorited(app, favoritedApps) {
+      return favoritedApps.some(
         (favoritedService) =>
-          favoritedService.clusterId === this.selectedCluster &&
-          favoritedService.service.id === service.id
+          favoritedService.app.id === app.id
       );
     },
   },
@@ -245,6 +259,8 @@ export default {
           ingresses,
           filteredApps,
         };
+      } else {
+        console.error('Cluster not found:', this.selectedCluster);
       }
       return null;
     },
@@ -354,15 +370,20 @@ export default {
         <i class="icon icon-list-flat" />
       </button>
     </div>
-    <div v-if="favoritedServices.length > 0">
+    <div v-if="favoritedApps.length > 0">
       <div class="cluster-header">
         <h2>{{ t('appLauncher.globalApps') }}</h2>
       </div>
       <div class="services-by-cluster-grid">
-        <AppLauncherCard v-for="favoritedService in favoritedServices"
-          :key="`${favoritedService.clusterId}-${favoritedService.service.id}`" :cluster-id="favoritedService.clusterId"
-          :service="favoritedService.service" :favorited-services="favoritedServices"
-          @toggle-favorite="toggleFavorite" />
+        <AppLauncherCard v-for="favoritedService in favoritedApps"
+          :key="`${favoritedService.clusterId}-${favoritedService.app.id}-${favoritedService.app.kind}`"
+          :cluster-id="favoritedService.clusterId"
+          :cluster-name="getClusterName(favoritedService.clusterId)"
+          :service="favoritedService.app.kind === 'Service' ? favoritedService.app : null"
+          :ingress="favoritedService.app.kind === 'Ingress' ? favoritedService.app : null"
+          :favorited-services="favoritedApps"
+          @toggle-favorite="toggleFavorite"
+        />
       </div>
     </div>
     <div v-if="selectedCluster">
@@ -378,9 +399,11 @@ export default {
               v-for="app in clusterData.filteredApps"
               :key="app.uniqueId"
               :cluster-id="clusterData.id"
-              :service="app.type === 'service' ? app : null"
-              :ingress="app.type === 'ingress' ? app : null"
-              :favorited-services="favoritedServices"
+              :cluster-name="clusterData.name"
+              :metadata="app.metadata"
+              :service="app.kind === 'Service' ? app : null"
+              :ingress="app.kind === 'Ingress' ? app : null"
+              :favorited-services="favoritedApps"
               @toggle-favorite="toggleFavorite"
             />
           </div>
@@ -417,7 +440,7 @@ export default {
             <template #cell:actions="{row}">
               <div style="display: flex; justify-content: flex-end;">
                 <button class="icon-button favorite-icon" @click="toggleFavorite(row)">
-                  <i :class="['icon', isFavorited(row, favoritedServices) ? 'icon-star' : 'icon-star-open']" />
+                  <i :class="['icon', isFavorited(row, favoritedApps) ? 'icon-star' : 'icon-star-open']" />
                 </button>
                 <a v-if="getEndpoints(row)?.length <= 1" :href="getEndpoints(row)[0]?.value" target="_blank"
                   rel="noopener noreferrer nofollow" class="btn role-primary">
