@@ -63,11 +63,7 @@ export default {
       const allClusters = await this.getClusters();
       this.servicesByCluster = await this.getServicesByCluster(allClusters);
       this.ingressesByCluster = await this.getIngressesByCluster(allClusters);
-
-      // Set the first cluster as the selected cluster
-      if (this.servicesByCluster.length > 0) {
-        this.selectedCluster = "ALL_CLUSTERS";
-      }
+      this.selectedCluster = "ALL_CLUSTERS";
       this.generateClusterOptions();
 
       // Retrieve global services based on annotations
@@ -75,8 +71,9 @@ export default {
         cluster.services.forEach((service) => {
           if (service.metadata?.annotations?.['extensions.applauncher/global-app'] === 'true') {
             this.favoritedApps.push({
+              ...service,
               clusterId: cluster.id,
-              app: service,
+              clusterName: cluster.name,
             });
           }
         });
@@ -87,8 +84,9 @@ export default {
         cluster.ingresses.forEach((ingress) => {
           if (ingress.metadata?.annotations?.['extensions.applauncher/global-app'] === 'true') {
             this.favoritedApps.push({
+              ...ingress,
               clusterId: cluster.id,
-              app: ingress,
+              clusterName: cluster.name,
             });
           }
         });
@@ -136,7 +134,11 @@ export default {
                   url: `/k8s/clusters/${cluster.id}/v1/services`,
                 })
               ).data;
-              clusterData.services = services;
+              clusterData.services = services.map((service) => ({
+                ...service,
+                clusterId: cluster.id,
+                clusterName: cluster.spec.displayName,
+              }));
             } catch (error) {
               console.error(`Error fetching services for cluster ${cluster.id}:`, error);
               clusterData.error = true;
@@ -165,7 +167,11 @@ export default {
                   url: `/k8s/clusters/${cluster.id}/v1/networking.k8s.io.ingresses`,
                 })
               ).data;
-              clusterData.ingresses = ingresses;
+              clusterData.ingresses = ingresses.map((ingress) => ({
+                ...ingress,
+                clusterId: cluster.id,
+                clusterName: cluster.spec.displayName,
+              }));
             } catch (error) {
               console.error(`Error fetching ingresses for cluster ${cluster.id}:`, error);
               clusterData.error = true;
@@ -185,16 +191,16 @@ export default {
     toggleSortOrder() {
       this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
     },
-    getEndpoints(service) {
+    getEndpoints(app) {
       return (
-        service?.spec.ports?.map((port) => {
+        app?.spec.ports?.map((port) => {
           const endpoint = `${
             isMaybeSecure(port.port, port.protocol) ? 'https' : 'http'
-          }:${service.metadata.name}:${port.port}`;
+          }:${app.metadata.name}:${port.port}`;
 
           return {
             label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
-            value: `/k8s/clusters/${this.selectedCluster}/api/v1/namespaces/${service.metadata.namespace}/services/${endpoint}/proxy`,
+            value: `/k8s/clusters/${this.selectedCluster}/api/v1/namespaces/${app.metadata.namespace}/services/${endpoint}/proxy`,
           };
         }) ?? []
       );
@@ -205,27 +211,26 @@ export default {
     toggleFavorite(item) {
       const index = this.favoritedApps.findIndex(
         (favoritedApp) =>
-          favoritedApp.app.id === item.id &&
-          favoritedApp.app.kind === item.kind
+          favoritedApp.id === item.id &&
+          favoritedApp.kind === item.kind
       );
       
       if (index !== -1) {
         this.favoritedApps.splice(index, 1);
       } else {
         this.favoritedApps.push({
-          clusterId: item.clusterId,
-          app: item,
+          ...item
         });
       }
 
       // Store updated favorites in localStorage
-      const favsToStore = JSON.stringify(this.favoritedApps.filter((item) => (item.app.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true')));
+      const favsToStore = JSON.stringify(this.favoritedApps.filter((item) => (item.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true')));
       localStorage.setItem('favoritedApps', favsToStore);
     },
     isFavorited(app, favoritedApps) {
       return favoritedApps.some(
         (favoritedService) =>
-          favoritedService.app.id === app.id
+          favoritedService.id === app.id
       );
     },
   },
@@ -233,9 +238,14 @@ export default {
     selectedClusterData() {
       const cluster = this.getCluster(this.selectedCluster);
       if (cluster) {
-        const ingresses = this.ingressesByCluster.find(
+        let ingresses = this.ingressesByCluster.find(
           (ingressCluster) => ingressCluster.id === cluster.id
         )?.ingresses || [];
+        ingresses = ingresses.map((ingress) => ({
+          ...ingress,
+          clusterId: cluster.id,
+          clusterName: cluster.name,
+        }));
 
         const services = cluster.services.map((service) => {
           const relatedIngress = ingresses.find((ingress) =>
@@ -247,6 +257,8 @@ export default {
           );
           return {
             ...service,
+            clusterId: cluster.id,
+            clusterName: cluster.name,
             relatedIngress,
           };
         });
@@ -266,11 +278,13 @@ export default {
     },
     displayedClusterData() {
       if (this.selectedCluster === 'ALL_CLUSTERS') {
-        return this.servicesByCluster.map(cluster => ({
+        
+        const allClustersData = this.servicesByCluster.map(cluster => ({
           ...cluster,
           ingresses: this.ingressesByCluster.find(ingressCluster => ingressCluster.id === cluster.id)?.ingresses || [],
           filteredApps: this.filteredApps(cluster.services, this.ingressesByCluster.find(ingressCluster => ingressCluster.id === cluster.id)?.ingresses || []),
         }));
+        return allClustersData;
       } else {
         return [this.selectedClusterData]; // This just remakes use of selectedClusterData for single cluster view
       }
@@ -279,13 +293,15 @@ export default {
       if (this.selectedClusterData) {
         const services = this.selectedClusterData.services.map((service) => ({
           ...service,
-          type: 'service',
+          clusterId: this.selectedClusterData.id,
+          clusterName: this.selectedClusterData.name,
           uniqueId: `service-${service.id}`,
         }));
 
         const ingresses = this.selectedClusterData.ingresses.map((ingress) => ({
           ...ingress,
-          type: 'ingress',
+          clusterId: this.selectedClusterData.id,
+          clusterName: this.selectedClusterData.name,
           uniqueId: `ingress-${ingress.id}`,
         }));
 
@@ -327,20 +343,6 @@ export default {
         }
       };
     },
-    sortedServices() {
-      if (this.selectedClusterData) {
-        return [...this.selectedClusterData.services].sort((a, b) => {
-          const nameA = a.metadata.name.toLowerCase();
-          const nameB = b.metadata.name.toLowerCase();
-          if (this.tableHeaders[0].sortOrder === 'asc') {
-            return nameA.localeCompare(nameB);
-          } else {
-            return nameB.localeCompare(nameA);
-          }
-        });
-      }
-      return [];
-    },
   },
   layout: 'plain',
 };
@@ -375,13 +377,11 @@ export default {
         <h2>{{ t('appLauncher.globalApps') }}</h2>
       </div>
       <div class="services-by-cluster-grid">
-        <AppLauncherCard v-for="favoritedService in favoritedApps"
-          :key="`${favoritedService.clusterId}-${favoritedService.app.id}-${favoritedService.app.kind}`"
-          :cluster-id="favoritedService.clusterId"
-          :cluster-name="getClusterName(favoritedService.clusterId)"
-          :service="favoritedService.app.kind === 'Service' ? favoritedService.app : null"
-          :ingress="favoritedService.app.kind === 'Ingress' ? favoritedService.app : null"
-          :favorited-services="favoritedApps"
+        <AppLauncherCard v-for="favoritedApp in favoritedApps"
+          :key="`${favoritedApp.clusterId}-${favoritedApp.id}-${favoritedApp.kind}-fav`"
+          :app="favoritedApp"
+          :isInGlobalView="true"
+          :favorited-apps="favoritedApps"
           @toggle-favorite="toggleFavorite"
         />
       </div>
@@ -397,13 +397,10 @@ export default {
           <div class="services-by-cluster-grid">
             <AppLauncherCard
               v-for="app in clusterData.filteredApps"
-              :key="app.uniqueId"
-              :cluster-id="clusterData.id"
-              :cluster-name="clusterData.name"
-              :metadata="app.metadata"
-              :service="app.kind === 'Service' ? app : null"
-              :ingress="app.kind === 'Ingress' ? app : null"
-              :favorited-services="favoritedApps"
+              :key="`${app.clusterId}-${app.id}-${app.kind}`"
+              :app="app"
+              :isInGlobalView="false"
+              :favorited-apps="favoritedApps"
               @toggle-favorite="toggleFavorite"
             />
           </div>
