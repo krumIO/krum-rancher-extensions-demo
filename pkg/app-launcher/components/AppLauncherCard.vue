@@ -105,10 +105,10 @@ export default {
     </template>
     <template #body>
       <p v-if="app.kind === 'Service'">
-        {{ (isGlobalApp || isFavorited) && isInGlobalView ? `${app.clusterName}` : '' }}/{{ namespace }}/{{ name }}
+        {{ (isGlobalApp || isFavorited) && isInGlobalView ? `${app.clusterName}/` : '' }}{{ namespace }}/{{ name }}
       </p>
-      <p v-if="app.Kind === 'Ingress'">
-        {{ (isGlobalApp || isFavorited) && isInGlobalView ? `${app.clusterName}` : '' }}/{{ ingressPath }}
+      <p v-if="app.kind === 'Ingress'">
+        {{ (isGlobalApp || isFavorited) && isInGlobalView ? `${app.clusterName}: ` : '' }}{{ ingressPath }}
       </p>
     </template>
     <template #actions>
