@@ -54,8 +54,8 @@ export default {
     align-items: center;
     gap: 1rem;
     position: fixed;
-    right: 6.6rem;
-    top: 4.2rem;
+    right: 5.8%;
+    top: 4.3rem;
     z-index: 2;
     padding-bottom: 0.425rem;
     padding-right: 4.4rem;
