@@ -26,6 +26,8 @@ export default {
       selectedView: 'grid',
       favoritedServices: [],
       searchQuery: '',
+      sortOrder: 'asc',
+      sortButtons: 'asc' ? { asc: true, desc: false } : { asc: false, desc: true },
       tableHeaders: [
         {
           name: 'name',
@@ -170,8 +172,17 @@ export default {
         value: cluster.id,
       }))];
     },
-    toggleSortOrder() {
-      this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
+    toggleSortOrder(sortOrder) {
+      const column = this.tableHeaders[0];
+      if (column.sortOrder === sortOrder && sortOrder === 'asc') {
+        return; // If already sorted in ascending order, do nothing
+      }
+      column.sortOrder = sortOrder;
+      if (sortOrder === 'asc') {
+        this.sortButtons = { asc: true, desc: false };
+      } else {
+        this.sortButtons = { asc: false, desc: true };
+      }
     },
     getEndpoints(service) {
       return (
@@ -259,6 +270,9 @@ export default {
         return [this.selectedClusterData]; // This just remakes use of selectedClusterData for single cluster view
       }
     },
+    sortButtons() {
+      return this.tableHeaders[0].sortOrder === 'asc' ? { asc: true, desc: false } : { asc: false, desc: true }
+    },
     sortedApps() {
       if (this.selectedClusterData) {
         const services = this.selectedClusterData.services.map((service) => ({
@@ -337,9 +351,17 @@ export default {
       <div class="search-input">
         <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
       </div>
-      <button class="icon-button" @click="toggleSortOrder" v-if="selectedView === 'grid'">
-        <i class="icon icon-sort" />
-      </button>
+      <div class="sort-buttons" v-if="selectedView === 'grid'">
+        <div class="sort-button" :class="{ active: sortButtons.asc }" :disabled="!sortButtons.asc" @click="toggleSortOrder('asc')">
+          <i class="icon-chevron-up"></i>
+        </div>
+        <div class="sort-label">
+          <p>A-Z</p>
+        </div>
+        <div class="sort-button" :class="{ active: sortButtons.desc }" :disabled="!sortButtons.desc" @click="toggleSortOrder('desc')">
+          <i class="icon-chevron-down"></i>
+        </div>
+      </div>
       <div class="select-wrapper">
         <select v-model="selectedCluster" class="cluster-select">
           <option v-for="option in clusterOptions" :key="option.value" :value="option.value">
@@ -484,6 +506,36 @@ export default {
   padding: 0;
   color: var(--primary);
   font-size: 1.8rem;
+}
+
+.sort-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: none;
+  color: var(--primary);
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+}
+
+.sort-label {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.sort-button:hover {
+  color: var(--primary-hover);
+}
+
+.sort-button.active {
+  color:#555555;
 }
 
 .favorite-icon {
