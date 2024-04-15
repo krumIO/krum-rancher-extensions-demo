@@ -12,3 +12,5 @@ appLauncher:
   selectCluster: Select a cluster
   globalApps: Global Apps
   filter: Filter
+  aToZ: A-Z
+  zToA: Z-A

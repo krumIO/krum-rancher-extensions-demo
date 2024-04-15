@@ -1,30 +1,29 @@
 <script>
 import { MANAGEMENT } from '@shell/config/types';
 import Loading from '@shell/components/Loading';
-import SortableTable from '@shell/components/SortableTable';
-import ButtonDropDown from '@shell/components/ButtonDropdown';
-import { isMaybeSecure } from '@shell/utils/url';
-import { ingressFullPath } from '@shell/models/networking.k8s.io.ingress';
 
 import AppLauncherCard from '../components/AppLauncherCard.vue';
+import ClusterActions from '../components/ClusterActions.vue';
+import ClusterGridView from '../components/ClusterGridView.vue';
+import ClusterListView from '../components/ClusterListView.vue';
 
 export default {
   components: {
     Loading,
     AppLauncherCard,
-    SortableTable,
-    ButtonDropDown
+    ClusterActions,
+    ClusterGridView,
+    ClusterListView,
   },
   data() {
     return {
       servicesByCluster: [],
       ingressesByCluster: [],
-      clusterLoading: {},
       loading: true,
       selectedCluster: null,
       clusterOptions: [],
       selectedView: 'grid',
-      favoritedServices: [],
+      favoritedApps: [],
       searchQuery: '',
       tableHeaders: [
         {
@@ -63,35 +62,45 @@ export default {
       const allClusters = await this.getClusters();
       this.servicesByCluster = await this.getServicesByCluster(allClusters);
       this.ingressesByCluster = await this.getIngressesByCluster(allClusters);
-
-      // Set the first cluster as the selected cluster
-      if (this.servicesByCluster.length > 0) {
-        this.selectedCluster = "ALL_CLUSTERS";
-      }
+      this.selectedCluster = "ALL_CLUSTERS";
       this.generateClusterOptions();
 
-      // Retrieve global apps based on annotations
+      // Retrieve global services based on annotations
       this.servicesByCluster.forEach((cluster) => {
         cluster.services.forEach((service) => {
           if (service.metadata?.annotations?.['extensions.applauncher/global-app'] === 'true') {
-            this.favoritedServices.push({
+            this.favoritedApps.push({
+              ...service,
               clusterId: cluster.id,
-              service,
+              clusterName: cluster.name,
+            });
+          }
+        });
+      });
+
+      // Retrieve global ingresses based on annotations
+      this.ingressesByCluster.forEach((cluster) => {
+        cluster.ingresses.forEach((ingress) => {
+          if (ingress.metadata?.annotations?.['extensions.applauncher/global-app'] === 'true') {
+            this.favoritedApps.push({
+              ...ingress,
+              clusterId: cluster.id,
+              clusterName: cluster.name,
             });
           }
         });
       });
 
       // Retrieve favorites from localStorage
-      const storedFavorites = localStorage.getItem('favoritedServices');
+      const storedFavorites = localStorage.getItem('favoritedApps');
       if (storedFavorites) {
-        this.favoritedServices.push(...JSON.parse(storedFavorites));
+        this.favoritedApps.push(...JSON.parse(storedFavorites));
       }
     } catch (error) {
       console.error('Error fetching clusters', error);
     } finally {
       this.loading = false;
-    };
+    }
   },
   methods: {
     async getClusters() {
@@ -99,12 +108,8 @@ export default {
         type: MANAGEMENT.CLUSTER,
       });
     },
-    getClusterName(clusterId) {
-      const cluster = this.servicesByCluster.find(c => c.id === clusterId);
-      return cluster ? cluster.name : '';
-    },
     getCluster(clusterId) {
-      return this.servicesByCluster.find(c => c.id === clusterId);
+      return this.servicesByCluster.find(c => c.id === clusterId) || null;
     },
     async getServicesByCluster(allClusters) {
       return await Promise.all(
@@ -124,7 +129,11 @@ export default {
                   url: `/k8s/clusters/${cluster.id}/v1/services`,
                 })
               ).data;
-              clusterData.services = services;
+              clusterData.services = services.map((service) => ({
+                ...service,
+                clusterId: cluster.id,
+                clusterName: cluster.spec.displayName,
+              }));
             } catch (error) {
               console.error(`Error fetching services for cluster ${cluster.id}:`, error);
               clusterData.error = true;
@@ -153,7 +162,11 @@ export default {
                   url: `/k8s/clusters/${cluster.id}/v1/networking.k8s.io.ingresses`,
                 })
               ).data;
-              clusterData.ingresses = ingresses;
+              clusterData.ingresses = ingresses.map((ingress) => ({
+                ...ingress,
+                clusterId: cluster.id,
+                clusterName: cluster.spec.displayName,
+              }));
             } catch (error) {
               console.error(`Error fetching ingresses for cluster ${cluster.id}:`, error);
               clusterData.error = true;
@@ -173,124 +186,66 @@ export default {
     toggleSortOrder() {
       this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
     },
-    getEndpoints(service) {
-      return (
-        service?.spec.ports?.map((port) => {
-          const endpoint = `${
-            isMaybeSecure(port.port, port.protocol) ? 'https' : 'http'
-          }:${service.metadata.name}:${port.port}`;
-
-          return {
-            label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
-            value: `/k8s/clusters/${this.selectedCluster}/api/v1/namespaces/${service.metadata.namespace}/services/${endpoint}/proxy`,
-          };
-        }) ?? []
+    toggleFavorite(item) {
+      const index = this.favoritedApps.findIndex(
+        (favoritedApp) =>
+          favoritedApp.id === item.id &&
+          favoritedApp.kind === item.kind
       );
-    },
-    openLink(link) {
-      window.open(link, '_blank');
-    },
-    toggleFavorite(service) {
-      const index = this.favoritedServices.findIndex(
-        (favoritedService) =>
-          favoritedService.clusterId === this.selectedCluster &&
-          favoritedService.service.id === service.id
-      );
+      
       if (index !== -1) {
-        this.favoritedServices.splice(index, 1);
+        this.favoritedApps.splice(index, 1);
       } else {
-        this.favoritedServices.push({
-          clusterId: this.selectedCluster,
-          service,
+        this.favoritedApps.push({
+          ...item
         });
       }
+
       // Store updated favorites in localStorage
-      localStorage.setItem('favoritedServices', JSON.stringify(this.favoritedServices.filter((s) => (s.service.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true'))));
+      const favsToStore = JSON.stringify(this.favoritedApps.filter((item) => (item.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true')));
+      localStorage.setItem('favoritedApps', favsToStore);
     },
-    isFavorited(service, favoritedServices) {
-      return favoritedServices.some(
-        (favoritedService) =>
-          favoritedService.clusterId === this.selectedCluster &&
-          favoritedService.service.id === service.id
-      );
+    updateSearchQuery(value) {
+      this.searchQuery = value;
     },
   },
   computed: {
     aToZorZtoA() {
       return this.tableHeaders[0].sortOrder === 'asc' ? 'A-Z' : 'Z-A';
     },
-    selectedClusterData() {
-      const cluster = this.getCluster(this.selectedCluster);
-      if (cluster) {
-        const ingresses = this.ingressesByCluster.find(
-          (ingressCluster) => ingressCluster.id === cluster.id
-        )?.ingresses || [];
-
-        const services = cluster.services.map((service) => {
-          const relatedIngress = ingresses.find((ingress) =>
-            ingress.spec.rules.some((rule) =>
-              rule.http.paths.some((path) =>
-                path.backend.service?.name === service.metadata.name
-              )
-            )
-          );
-          return {
-            ...service,
-            relatedIngress,
-          };
-        });
-        
-        const filteredApps = this.filteredApps(services, ingresses);
-
-        return {
-          ...cluster,
-          services,
-          ingresses,
-          filteredApps,
-        };
-      }
-      return null;
-    },
     displayedClusterData() {
       if (this.selectedCluster === 'ALL_CLUSTERS') {
-        return this.servicesByCluster.map(cluster => ({
+        const allClustersData = this.servicesByCluster.map(cluster => ({
           ...cluster,
           ingresses: this.ingressesByCluster.find(ingressCluster => ingressCluster.id === cluster.id)?.ingresses || [],
           filteredApps: this.filteredApps(cluster.services, this.ingressesByCluster.find(ingressCluster => ingressCluster.id === cluster.id)?.ingresses || []),
         }));
+        return allClustersData;
       } else {
-        return [this.selectedClusterData]; // This just remakes use of selectedClusterData for single cluster view
-      }
-    },
-    sortedApps() {
-      if (this.selectedClusterData) {
-        const services = this.selectedClusterData.services.map((service) => ({
-          ...service,
-          type: 'service',
-          uniqueId: `service-${service.id}`,
-        }));
+        const cluster = this.getCluster(this.selectedCluster);
+        if (cluster) {
+          const ingresses = this.ingressesByCluster.find(
+            (ingressCluster) => ingressCluster.id === cluster.id
+          )?.ingresses || [];
 
-        const ingresses = this.selectedClusterData.ingresses.map((ingress) => ({
-          ...ingress,
-          type: 'ingress',
-          uniqueId: `ingress-${ingress.id}`,
-        }));
+          const services = cluster.services;
+          
+          const filteredApps = this.filteredApps(services, ingresses);
 
-        return [...services, ...ingresses].sort((a, b) => {
-          const nameA = a.metadata.name.toLowerCase();
-          const nameB = b.metadata.name.toLowerCase();
-          if (this.tableHeaders[0].sortOrder === 'asc') {
-            return nameA.localeCompare(nameB);
-          } else {
-            return nameB.localeCompare(nameA);
-          }
-        });
+          return [{
+            ...cluster,
+            ingresses,
+            filteredApps,
+          }];
+        } else {
+          console.error('Cluster not found:', this.selectedCluster);
+        }
       }
       return [];
     },
     filteredApps() {
       return (services, ingresses) => {
-        const sortedApps = [...(services || []), ...(ingresses || {})].sort((a, b) => {
+        const sortedApps = [...(services || []), ...(ingresses || [])].sort((a, b) => {
           const nameA = a.metadata.name.toLowerCase();
           const nameB = b.metadata.name.toLowerCase();
           if (this.tableHeaders[0].sortOrder === 'asc') {
@@ -314,20 +269,6 @@ export default {
         }
       };
     },
-    sortedServices() {
-      if (this.selectedClusterData) {
-        return [...this.selectedClusterData.services].sort((a, b) => {
-          const nameA = a.metadata.name.toLowerCase();
-          const nameB = b.metadata.name.toLowerCase();
-          if (this.tableHeaders[0].sortOrder === 'asc') {
-            return nameA.localeCompare(nameB);
-          } else {
-            return nameB.localeCompare(nameA);
-          }
-        });
-      }
-      return [];
-    },
   },
   layout: 'plain',
 };
@@ -336,109 +277,49 @@ export default {
 <template>
   <Loading v-if="loading" :label="$store.getters['i18n/t']('appLauncher.loading')" />
   <div v-else class="main-container">
-    <div class="cluster-actions">
-      <div class="search-input">
-        <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
-      </div>
-      <div class="sort-buttons" v-if="selectedView === 'grid'" @click="toggleSortOrder()">
-        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'asc' }" :disabled="this.tableHeaders[0].sortOrder === 'asc'">
-          <i class="icon-chevron-up"></i>
-        </div>
-        <div class="sort-label">
-          <p>{{ aToZorZtoA }}</p>
-        </div>
-        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'desc' }" :disabled="this.tableHeaders[0].sortOrder === 'desc'">
-          <i class="icon-chevron-down"></i>
-        </div>
-      </div>
-      <div class="select-wrapper">
-        <select v-model="selectedCluster" class="cluster-select">
-          <option v-for="option in clusterOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-      </div>
-      <button class="icon-button" @click="selectedView = 'grid'">
-        <i class="icon icon-apps" />
-      </button>
-      <button class="icon-button" @click="selectedView = 'list'">
-        <i class="icon icon-list-flat" />
-      </button>
-    </div>
-    <div v-if="favoritedServices.length > 0">
+    <ClusterActions
+      :search-query="searchQuery"
+      :is-grid-view="selectedView === 'grid'"
+      :selected-cluster="selectedCluster"
+      :cluster-options="clusterOptions"
+      :sort-order="tableHeaders[0].sortOrder"
+      @update:search-query="updateSearchQuery"
+      @toggle-sort="toggleSortOrder"
+      @update:selected-cluster="selectedCluster = $event"
+      @set-view="selectedView = $event"
+    />
+    <div v-if="favoritedApps.length > 0">
       <div class="cluster-header">
         <h2>{{ t('appLauncher.globalApps') }}</h2>
       </div>
       <div class="services-by-cluster-grid">
-        <AppLauncherCard v-for="favoritedService in favoritedServices"
-          :key="`${favoritedService.clusterId}-${favoritedService.service.id}`" :cluster-id="favoritedService.clusterId"
-          :service="favoritedService.service" :favorited-services="favoritedServices"
-          @toggle-favorite="toggleFavorite" />
+        <AppLauncherCard v-for="favoritedApp in favoritedApps"
+          :key="`${favoritedApp.clusterId}-${favoritedApp.id}-${favoritedApp.kind}-fav`"
+          :app="favoritedApp"
+          :isInGlobalView="true"
+          :favorited-apps="favoritedApps"
+          @toggle-favorite="toggleFavorite"
+        />
       </div>
     </div>
     <div v-if="selectedCluster">
       <div v-if="selectedView === 'grid'">
         <div v-for="clusterData in displayedClusterData" :key="clusterData.id">
-          <div class="cluster-header">
-            <h1>
-              {{ clusterData.name }}
-            </h1>
-          </div>
-          <div class="services-by-cluster-grid">
-            <AppLauncherCard
-              v-for="app in clusterData.filteredApps"
-              :key="app.uniqueId"
-              :cluster-id="clusterData.id"
-              :service="app.type === 'service' ? app : null"
-              :ingress="app.type === 'ingress' ? app : null"
-              :favorited-services="favoritedServices"
-              @toggle-favorite="toggleFavorite"
-            />
-          </div>
+          <ClusterGridView
+            :cluster-data="clusterData"
+            :favorited-apps="favoritedApps"
+            @toggle-favorite="toggleFavorite"
+          />
         </div>
       </div>
       <div v-else-if="selectedView === 'list'">
         <div v-for="clusterData in displayedClusterData" :key="clusterData.id">
-          <div class="cluster-header">
-            <h1>
-              {{ clusterData.name }}
-            </h1>
-          </div>
-          <SortableTable
-            :rows="clusterData.filteredApps"
-            :headers="tableHeaders"
-            :row-key="'uniqueId'"
-            :search="false"
-            :table-actions="false"
-            :row-actions="false"
-            :no-rows-text="$store.getters['i18n/t']('appLauncher.noAppsFound')"
-          >
-            <template #cell:name="{row}">
-              {{ row.metadata.name }}
-            </template>
-            <template #cell:namespace="{row}">
-              {{ row.metadata.namespace }}
-            </template>
-            <template #cell:version="{row}">
-              {{ row.metadata.labels?.['app.kubernetes.io/version'] }}
-            </template>
-            <template #cell:helmChart="{row}">
-              {{ row.metadata.labels?.['helm.sh/chart'] }}
-            </template>
-            <template #cell:actions="{row}">
-              <div style="display: flex; justify-content: flex-end;">
-                <button class="icon-button favorite-icon" @click="toggleFavorite(row)">
-                  <i :class="['icon', isFavorited(row, favoritedServices) ? 'icon-star' : 'icon-star-open']" />
-                </button>
-                <a v-if="getEndpoints(row)?.length <= 1" :href="getEndpoints(row)[0]?.value" target="_blank"
-                  rel="noopener noreferrer nofollow" class="btn role-primary">
-                  {{ t('appLauncher.launch') }}
-                </a>
-                <ButtonDropDown v-else :button-label="t('appLauncher.launch')" :dropdown-options="getEndpoints(row)"
-                  :title="t('appLauncher.launchAnEndpointFromSelection')" @click-action="(o) => openLink(o.value)" />
-              </div>
-            </template>
-          </SortableTable>
+          <ClusterListView
+            :cluster-data="clusterData"
+            :favorited-apps="favoritedApps"
+            :table-headers="tableHeaders"
+            @toggle-favorite="toggleFavorite"
+          />
         </div>
       </div>
     </div>
@@ -474,79 +355,11 @@ export default {
   z-index: 1;
 }
 
-.cluster-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  position: fixed;
-  right: 6rem;
-  top: 4.4rem;
-  z-index: 2;
-  padding-bottom: 0.425rem;
-  padding-right: 4.4rem;
-  background: inherit;
-  border-bottom: var(--header-border-size) solid var(--header-border);
-}
-
-.icon-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: var(--primary);
-  font-size: 1.8rem;
-}
-
-.sort-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: none;
-  color:#555555;
-  font-size: 1.3rem;
-  display: flex;
-  align-items: center;
-}
-
-.sort-label {
-  color: var(--primary);
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.sort-buttons {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-.sort-button:hover {
-  color: var(--primary-hover);
-}
-
-.sort-button.active {
-  color: var(--primary);
-}
-
 .favorite-icon {
   margin-right: 1rem;
 }
 
 .icon-button:hover {
   color: var(--primary-hover);
-}
-
-.search-input {
-  text-align: right;
-  justify-content: flex-end;
-  display: flex;
-
-  input {
-    width: 190px;
-    padding: 11px;
-    font-size: 1rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-  }
 }
 </style>
