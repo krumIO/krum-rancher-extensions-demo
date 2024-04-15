@@ -26,8 +26,6 @@ export default {
       selectedView: 'grid',
       favoritedServices: [],
       searchQuery: '',
-      sortOrder: 'asc',
-      sortButtons: 'asc' ? { asc: true, desc: false } : { asc: false, desc: true },
       tableHeaders: [
         {
           name: 'name',
@@ -172,17 +170,8 @@ export default {
         value: cluster.id,
       }))];
     },
-    toggleSortOrder(sortOrder) {
-      const column = this.tableHeaders[0];
-      if (column.sortOrder === sortOrder && sortOrder === 'asc') {
-        return; // If already sorted in ascending order, do nothing
-      }
-      column.sortOrder = sortOrder;
-      if (sortOrder === 'asc') {
-        this.sortButtons = { asc: true, desc: false };
-      } else {
-        this.sortButtons = { asc: false, desc: true };
-      }
+    toggleSortOrder() {
+      this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
     },
     getEndpoints(service) {
       return (
@@ -270,9 +259,6 @@ export default {
         return [this.selectedClusterData]; // This just remakes use of selectedClusterData for single cluster view
       }
     },
-    sortButtons() {
-      return this.tableHeaders[0].sortOrder === 'asc' ? { asc: true, desc: false } : { asc: false, desc: true }
-    },
     sortedApps() {
       if (this.selectedClusterData) {
         const services = this.selectedClusterData.services.map((service) => ({
@@ -352,13 +338,13 @@ export default {
         <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
       </div>
       <div class="sort-buttons" v-if="selectedView === 'grid'">
-        <div class="sort-button" :class="{ active: sortButtons.asc }" :disabled="!sortButtons.asc" @click="toggleSortOrder('asc')">
+        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'asc' }" :disabled="this.tableHeaders[0].sortOrder === 'asc'" @click="toggleSortOrder()">
           <i class="icon-chevron-up"></i>
         </div>
         <div class="sort-label">
           <p>A-Z</p>
         </div>
-        <div class="sort-button" :class="{ active: sortButtons.desc }" :disabled="!sortButtons.desc" @click="toggleSortOrder('desc')">
+        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'desc' }" :disabled="this.tableHeaders[0].sortOrder === 'desc'" @click="toggleSortOrder()">
           <i class="icon-chevron-down"></i>
         </div>
       </div>
