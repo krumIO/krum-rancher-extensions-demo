@@ -1,6 +1,18 @@
 # Rancher App Launcher Extension
 
-Rancher App Launcher Extension is a powerful tool for improved accessibility and resource discovery within the Rancher ecosystem. The extension is designed to extract ingresses from various clusters and consolidate them into a unified global resource page. With neatly organized cards for each discovered service, the tool offers an efficient method of displaying and accessing your Rancher services, making the Rancher experience seamless for both new and experienced users.
+Rancher App Launcher Extension is a simple yet powerful tool for improved accessibility and resource discovery within Kubernetes. The extension is designed to extract ingresses from various clusters and consolidate them into a unified global resource page. With neatly organized cards for each discovered service, the tool offers an efficient method of displaying and accessing your Rancher services, making the Rancher experience seamless for both new and experienced users.
+
+The extension intends to improve the discoverability of services and offer a straightforward way to navigate the complexities of multi-cluster environments.
+
+<img src="./docs/images/preview.png" width="50%" alt="App Launcher Extension preview image">
+
+## Features
+
+- Unified resource page for all discovered services and ingresses
+- Convenient access to services with a simple click
+- Global apps section for user-selected favorites and global apps defined by cluster YAML files
+- Grid and list views for easy navigation
+- Multi-cluster support for viewing services across different clusters
 
 ## How to Run
 
@@ -10,12 +22,29 @@ Rancher App Launcher Extension is a powerful tool for improved accessibility and
 
 ## Usage
 
-- Once the Rancher App Launcher Extension is installed, you can access a unified resource page from the main dashboard.
+### Tag "Global" Apps
+
+Global apps will show at the top of the App Launcher page as a combination of global apps defined by cluster YAML files and user-selected favorites.
+
+- Apps tagged in Yaml will persist for all users.
+- (currently) User-selected favorites will only persist for the user who selected them and are stored in the browser's local storage.
+
+To select a Service or Ingress as a Global App, add the following annotation to the Service or Ingress:
+
+```yaml
+metadata:
+  annotations:
+    extensions.applauncher/global-app: "true"
+```
+
+### Filter by Name
+
+
+
+### Filter by Cluster
+
 - This page showcases cards for each discovered service and ingress, allowing you to conveniently open the service with a simple click.
-    *The extension is designed to improve discoverability, and offer a straightforward way to navigate the complexities of multi-cluster environments.*
-- Global apps will show at the top as a combination of global apps defined by cluster YAML files and user-selected favorites
-    *\*note: global apps can be set by modifying the service's `metadata.annotations['extensions.applauncher/global-app']` to 'true'*
-- Select different clusters to view the services of. Global Apps perisist across all views.
+    *The extension is designed to improve discoverability and offer a straightforward way to navigate the complexities of multi-cluster environments.*
 - The view can be changed with the view buttons from grid to list views.
 
 ## Contribution

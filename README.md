@@ -2,21 +2,25 @@
 
 This collection of Rancher extensions is designed to provide additional functionality to the Rancher dashboard, particularly to fill user-experience gaps for non-operator users.
 
-## App Launcher
+## Platform Tools
 
-Currently, if a user wants to access a software application running in Rancher/kubernetes, they need to dig deep into the services/ingress section in Rancher, or learn how to build the proxy URL or on their own. Otherwise, operators need to use an ingress to create convenient access for users.
+### [App Launcher](./pkg/app-launcher/README.md)
+
+Currently, if a user wants to access a software application running in Rancher/kubernetes, they need to dig deep into the services/ingress section in Rancher, or learn how to build the proxy URL on their own. Otherwise, operators need to use an ingress to create convenient access for users.
 
 However, the proxy URL can be a powerful tool in Rancher. It allows a user with appropriate access to a namespaced resource to access that resource/application without ingress.
 
 The App Launcher will expose a top-level directory of service/ingress objects, and will assemble proxy URLs. It will also provide an option to launch that ingress, if available.
 
-## Pirate Language (unreleased)
+## i18n
+
+### [Pirate Locale (unreleased)](./pkg/pirate-locale/README.md)
 
 This extension, for fun, is intended to demonstrate internationalization (i18n) for Rancher via Rancher extensions, as an homage to the Google search pirate translation from years ago.
 
 This is currently unreleased, but will be available in the future. Contributions are welcome.
 
-# Install for Rancher
+# Installation
 
 To install the extension, you will need Rancher 2.7.6 or later.
 
@@ -52,9 +56,12 @@ To install the extension, you will need Rancher 2.7.6 or later.
 
 Profit!
 
-# Setup for Development
+# Development
 
-### Node
+## Requirements
+
+The extensions and the Rancher Dashboard code are currently built with Node 16.
+
 We recommend managing node versions with [nvm](https://github.com/nvm-sh/nvm).
 
 ```sh
@@ -63,13 +70,28 @@ cd # project directory
 nvm install $(cat package.json | grep '\"node\": ' | grep -o '[0-9.]*')
 ```
 
+When using nvm, you can use the following command to switch to the correct node version:
+
+```sh
+  nvm use 16
+```
+
+<!-- verify if we actually need this.
 ### Yarn
 
 We use [corepack](https://nodejs.org/api/corepack.html) (comes with Node.js) to manager our package manger's version. To install, run the following from the project's root directory.
 
 ```
 corepack enable
-```
+``` -->
+
+## Starting development
+
+1. Clone this repository
+
+2. Run `yarn install`
+
+3. Run `API=<Rancher Backend base URL> yarn dev`
 
 ## Troubleshooting
 

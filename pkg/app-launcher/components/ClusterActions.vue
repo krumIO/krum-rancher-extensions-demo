@@ -59,7 +59,7 @@ export default {
     z-index: 2;
     padding-bottom: 0.425rem;
     padding-right: 4.4rem;
-    background: rgb(27, 28, 33);
+    background: inherit;
     border-bottom: var(--header-border-size) solid var(--header-border);
 }
 
