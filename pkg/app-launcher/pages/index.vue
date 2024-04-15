@@ -26,8 +26,6 @@ export default {
       selectedView: 'grid',
       favoritedServices: [],
       searchQuery: '',
-      sortOrder: 'asc',
-      sortButtons: 'asc' ? { asc: true, desc: false } : { asc: false, desc: true },
       tableHeaders: [
         {
           name: 'name',
@@ -172,17 +170,8 @@ export default {
         value: cluster.id,
       }))];
     },
-    toggleSortOrder(sortOrder) {
-      const column = this.tableHeaders[0];
-      if (column.sortOrder === sortOrder && sortOrder === 'asc') {
-        return; // If already sorted in ascending order, do nothing
-      }
-      column.sortOrder = sortOrder;
-      if (sortOrder === 'asc') {
-        this.sortButtons = { asc: true, desc: false };
-      } else {
-        this.sortButtons = { asc: false, desc: true };
-      }
+    toggleSortOrder() {
+      this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
     },
     getEndpoints(service) {
       return (
@@ -227,6 +216,9 @@ export default {
     },
   },
   computed: {
+    aToZorZtoA() {
+      return this.tableHeaders[0].sortOrder === 'asc' ? 'A-Z' : 'Z-A';
+    },
     selectedClusterData() {
       const cluster = this.getCluster(this.selectedCluster);
       if (cluster) {
@@ -269,9 +261,6 @@ export default {
       } else {
         return [this.selectedClusterData]; // This just remakes use of selectedClusterData for single cluster view
       }
-    },
-    sortButtons() {
-      return this.tableHeaders[0].sortOrder === 'asc' ? { asc: true, desc: false } : { asc: false, desc: true }
     },
     sortedApps() {
       if (this.selectedClusterData) {
@@ -351,14 +340,14 @@ export default {
       <div class="search-input">
         <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
       </div>
-      <div class="sort-buttons" v-if="selectedView === 'grid'">
-        <div class="sort-button" :class="{ active: sortButtons.asc }" :disabled="!sortButtons.asc" @click="toggleSortOrder('asc')">
+      <div class="sort-buttons" v-if="selectedView === 'grid'" @click="toggleSortOrder()">
+        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'asc' }" :disabled="this.tableHeaders[0].sortOrder === 'asc'">
           <i class="icon-chevron-up"></i>
         </div>
         <div class="sort-label">
-          <p>A-Z</p>
+          <p>{{ aToZorZtoA }}</p>
         </div>
-        <div class="sort-button" :class="{ active: sortButtons.desc }" :disabled="!sortButtons.desc" @click="toggleSortOrder('desc')">
+        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'desc' }" :disabled="this.tableHeaders[0].sortOrder === 'desc'">
           <i class="icon-chevron-down"></i>
         </div>
       </div>
@@ -513,7 +502,7 @@ export default {
   border: none;
   cursor: pointer;
   padding: none;
-  color: var(--primary);
+  color:#555555;
   font-size: 1.3rem;
   display: flex;
   align-items: center;
@@ -522,6 +511,7 @@ export default {
 .sort-label {
   color: var(--primary);
   font-size: 1rem;
+  cursor: pointer;
 }
 
 .sort-buttons {
@@ -535,7 +525,7 @@ export default {
 }
 
 .sort-button.active {
-  color:#555555;
+  color: var(--primary);
 }
 
 .favorite-icon {
