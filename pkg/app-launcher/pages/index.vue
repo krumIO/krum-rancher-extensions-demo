@@ -7,12 +7,16 @@ import { isMaybeSecure } from '@shell/utils/url';
 
 import AppLauncherCard from '../components/AppLauncherCard.vue';
 import ClusterActions from '../components/ClusterActions.vue';
+import ClusterGridView from '../components/ClusterGridView.vue';
+import ClusterListView from '../components/ClusterListView.vue';
 
 export default {
   components: {
     Loading,
     AppLauncherCard,
     ClusterActions,
+    ClusterGridView,
+    ClusterListView,
     SortableTable,
     ButtonDropDown
   },
@@ -28,35 +32,35 @@ export default {
       favoritedApps: [],
       searchQuery: '',
       tableHeaders: [
-        {
-          name: 'name',
-          label: 'Name',
-          value: 'metadata.name',
-          sort: 'metadata.name',
-          sortOrder: 'asc',
-        },
-        {
-          name: 'namespace',
-          label: 'Namespace',
-          value: 'metadata.namespace',
-        },
-        {
-          name: 'version',
-          label: 'Version',
-          value: 'metadata.labels["app.kubernetes.io/version"]',
-        },
-        {
-          name: 'helmChart',
-          label: 'Helm Chart',
-          value: 'metadata.labels["helm.sh/chart"]',
-        },
-        {
-          name: 'actions',
-          label: 'Actions',
-          value: 'actions',
-          align: 'right',
-        },
-      ],
+            {
+                name: 'name',
+                label: 'Name',
+                value: 'metadata.name',
+                sort: 'metadata.name',
+                sortOrder: 'asc',
+            },
+            {
+                name: 'namespace',
+                label: 'Namespace',
+                value: 'metadata.namespace',
+            },
+            {
+                name: 'version',
+                label: 'Version',
+                value: 'metadata.labels["app.kubernetes.io/version"]',
+            },
+            {
+                name: 'helmChart',
+                label: 'Helm Chart',
+                value: 'metadata.labels["helm.sh/chart"]',
+            },
+            {
+                name: 'actions',
+                label: 'Actions',
+                value: 'actions',
+                align: 'right',
+            },
+        ],
     };
   },
   async mounted() {
@@ -231,7 +235,8 @@ export default {
     isFavorited(app, favoritedApps) {
       return favoritedApps.some(
         (favoritedService) =>
-          favoritedService.id === app.id
+          favoritedService.id === app.id &&
+          favoritedService.kind === app.kind
       );
     },
     updateSearchQuery(value) {
@@ -387,66 +392,20 @@ export default {
     </div>
     <div v-if="selectedCluster">
       <div v-if="selectedView === 'grid'">
-        <div v-for="clusterData in displayedClusterData" :key="clusterData.id">
-          <div class="cluster-header">
-            <h1>
-              {{ clusterData.name }}
-            </h1>
-          </div>
-          <div class="services-by-cluster-grid">
-            <AppLauncherCard
-              v-for="app in clusterData.filteredApps"
-              :key="`${app.clusterId}-${app.id}-${app.kind}`"
-              :app="app"
-              :isInGlobalView="false"
-              :favorited-apps="favoritedApps"
-              @toggle-favorite="toggleFavorite"
-            />
-          </div>
-        </div>
+        <ClusterGridView
+          :displayed-cluster-data="displayedClusterData"
+          :favorited-apps="favoritedApps"
+          @toggle-favorite="toggleFavorite"
+        />
       </div>
       <div v-else-if="selectedView === 'list'">
         <div v-for="clusterData in displayedClusterData" :key="clusterData.id">
-          <div class="cluster-header">
-            <h1>
-              {{ clusterData.name }}
-            </h1>
-          </div>
-          <SortableTable
-            :rows="clusterData.filteredApps"
-            :headers="tableHeaders"
-            :row-key="'uniqueId'"
-            :search="false"
-            :table-actions="false"
-            :row-actions="false"
-            :no-rows-text="$store.getters['i18n/t']('appLauncher.noAppsFound')"
-          >
-            <template #cell:name="{row}">
-              {{ row.metadata.name }}
-            </template>
-            <template #cell:namespace="{row}">
-              {{ row.metadata.namespace }}
-            </template>
-            <template #cell:version="{row}">
-              {{ row.metadata.labels?.['app.kubernetes.io/version'] }}
-            </template>
-            <template #cell:helmChart="{row}">
-              {{ row.metadata.labels?.['helm.sh/chart'] }}
-            </template>
-            <template #cell:actions="{row}">
-              <div style="display: flex; justify-content: flex-end;">
-                <button class="icon-button favorite-icon" @click="toggleFavorite(row)">
-                  <i :class="['icon', isFavorited(row, favoritedApps) ? 'icon-star' : 'icon-star-open']" />
-                </button>
-                <a v-if="getEndpoints(row)?.length <= 1" :href="getEndpoints(row)[0]?.value" target="_blank"
-                  rel="noopener noreferrer nofollow" class="btn role-primary">
-                  {{ t('appLauncher.launch') }}
-                </a>
-                <ButtonDropDown v-else :button-label="t('appLauncher.launch')" :dropdown-options="getEndpoints(row)"
-                  :title="t('appLauncher.launchAnEndpointFromSelection')" @click-action="(o) => openLink(o.value)" />
-              </div>
-            </template>
-          </SortableTable>
+          <ClusterListView
+            :cluster-data="clusterData"
+            :favorited-apps="favoritedApps"
+            :table-headers="tableHeaders"
+            @toggle-favorite="toggleFavorite"
+          />
         </div>
       </div>
     </div>
