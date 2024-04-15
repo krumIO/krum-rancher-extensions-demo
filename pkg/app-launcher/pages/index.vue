@@ -234,6 +234,15 @@ export default {
           favoritedService.id === app.id
       );
     },
+    updateSearchQuery(value) {
+      this.searchQuery = value;
+    },
+    updateSelectedCluster(value) {
+      this.selectedCluster = value;
+    },
+    updateSelectedView(value) {
+      this.selectedView = value;
+    },
   },
   computed: {
     selectedClusterData() {
@@ -357,32 +366,11 @@ export default {
       :is-grid-view="selectedView === 'grid'"
       :selected-cluster="selectedCluster"
       :cluster-options="clusterOptions"
-      @update:search-query="searchQuery = $event"
+      @update:search-query="updateSearchQuery"
       @toggle-sort="toggleSortOrder"
       @update:selected-cluster="selectedCluster = $event"
       @set-view="selectedView = $event"
     />
-    <!-- <div class="cluster-actions">
-      <div class="search-input">
-        <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
-      </div>
-      <button class="icon-button" @click="toggleSortOrder" v-if="selectedView === 'grid'">
-        <i class="icon icon-sort" />
-      </button>
-      <div class="select-wrapper">
-        <select v-model="selectedCluster" class="cluster-select">
-          <option v-for="option in clusterOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-      </div>
-      <button class="icon-button" @click="selectedView = 'grid'">
-        <i class="icon icon-apps" />
-      </button>
-      <button class="icon-button" @click="selectedView = 'list'">
-        <i class="icon icon-list-flat" />
-      </button>
-    </div> -->
     <div v-if="favoritedApps.length > 0">
       <div class="cluster-header">
         <h2>{{ t('appLauncher.globalApps') }}</h2>
@@ -494,48 +482,7 @@ export default {
   z-index: 1;
 }
 
-.cluster-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  position: fixed;
-  right: 6rem;
-  top: 4.4rem;
-  z-index: 2;
-  padding-bottom: 0.425rem;
-  padding-right: 4.4rem;
-  background: rgb(27, 28, 33);
-  border-bottom: var(--header-border-size) solid var(--header-border);
-}
-
-.icon-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: var(--primary);
-  font-size: 1.8rem;
-}
-
 .favorite-icon {
   margin-right: 1rem;
-}
-
-.icon-button:hover {
-  color: var(--primary-hover);
-}
-
-.search-input {
-  text-align: right;
-  justify-content: flex-end;
-  display: flex;
-
-  input {
-    width: 190px;
-    padding: 11px;
-    font-size: 1rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-  }
 }
 </style>

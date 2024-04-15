@@ -25,25 +25,25 @@ export default {
 
 <template>
     <div class="cluster-actions">
-    <div class="search-input">
-        <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" @input="$emit('update:search-query', searchQuery)" />
-    </div>
-    <button class="icon-button" @click="$emit('toggle-sort')" v-if="isGridView">
-        <i class="icon icon-sort" />
-    </button>
-    <div class="select-wrapper">
-        <select v-model="selectedCluster" class="cluster-select" @change="$emit('update:selected-cluster', selectedCluster)">
-        <option v-for="option in clusterOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-        </option>
-        </select>
-    </div>
-    <button class="icon-button" @click="$emit('set-view', 'grid')">
-        <i class="icon icon-apps" />
-    </button>
-    <button class="icon-button" @click="$emit('set-view', 'list')">
-        <i class="icon icon-list-flat" />
-    </button>
+        <div class="search-input">
+            <input :value="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" @input="$emit('update:search-query', $event.target.value)" />
+        </div>
+        <button class="icon-button" @click="$emit('toggle-sort')" v-if="isGridView">
+            <i class="icon icon-sort" />
+        </button>
+        <div class="select-wrapper">
+            <select :value="selectedCluster" class="cluster-select" @change="$emit('update:selected-cluster', $event.target.value)">
+                <option v-for="option in clusterOptions" :key="option.value" :value="option.value">
+                    {{ option.label }}
+                </option>
+            </select>
+        </div>
+        <button class="icon-button" @click="$emit('set-view', 'grid')">
+            <i class="icon icon-apps" />
+        </button>
+        <button class="icon-button" @click="$emit('set-view', 'list')">
+            <i class="icon icon-list-flat" />
+        </button>
     </div>
 </template>
 
@@ -53,23 +53,41 @@ export default {
     display: flex;
     align-items: center;
     gap: 1rem;
-    background-color: #f4f4f5;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    right: 6.6rem;
+    top: 4.2rem;
+    z-index: 2;
+    padding-bottom: 0.425rem;
+    padding-right: 4.4rem;
+    background: rgb(27, 28, 33);
+    border-bottom: var(--header-border-size) solid var(--header-border);
 }
 
 .icon-button {
     background: none;
     border: none;
     cursor: pointer;
-    color: #333;
-    font-size: 1.6rem;
+    padding: 0;
+    color: var(--primary);
+    font-size: 1.8rem;
 }
 
-.search-input input {
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.icon-button:hover {
+    color: var(--primary-hover);
+}
+
+.search-input {
+    text-align: right;
+    justify-content: flex-end;
+    display: flex;
+
+    input {
+        width: 190px;
+        padding: 11px;
+        font-size: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+    }
 }
 
 .select-wrapper select {
