@@ -216,6 +216,9 @@ export default {
     },
   },
   computed: {
+    aToZorZtoA() {
+      return this.tableHeaders[0].sortOrder === 'asc' ? 'A-Z' : 'Z-A';
+    },
     selectedClusterData() {
       const cluster = this.getCluster(this.selectedCluster);
       if (cluster) {
@@ -337,9 +340,17 @@ export default {
       <div class="search-input">
         <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
       </div>
-      <button class="icon-button" @click="toggleSortOrder" v-if="selectedView === 'grid'">
-        <i class="icon icon-sort" />
-      </button>
+      <div class="sort-buttons" v-if="selectedView === 'grid'" @click="toggleSortOrder()">
+        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'asc' }" :disabled="this.tableHeaders[0].sortOrder === 'asc'">
+          <i class="icon-chevron-up"></i>
+        </div>
+        <div class="sort-label">
+          <p>{{ aToZorZtoA }}</p>
+        </div>
+        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'desc' }" :disabled="this.tableHeaders[0].sortOrder === 'desc'">
+          <i class="icon-chevron-down"></i>
+        </div>
+      </div>
       <div class="select-wrapper">
         <select v-model="selectedCluster" class="cluster-select">
           <option v-for="option in clusterOptions" :key="option.value" :value="option.value">
@@ -484,6 +495,37 @@ export default {
   padding: 0;
   color: var(--primary);
   font-size: 1.8rem;
+}
+
+.sort-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: none;
+  color:#555555;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+}
+
+.sort-label {
+  color: var(--primary);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.sort-button:hover {
+  color: var(--primary-hover);
+}
+
+.sort-button.active {
+  color: var(--primary);
 }
 
 .favorite-icon {
