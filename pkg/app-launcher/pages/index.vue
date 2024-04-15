@@ -4,14 +4,15 @@ import Loading from '@shell/components/Loading';
 import SortableTable from '@shell/components/SortableTable';
 import ButtonDropDown from '@shell/components/ButtonDropdown';
 import { isMaybeSecure } from '@shell/utils/url';
-import { ingressFullPath } from '@shell/models/networking.k8s.io.ingress';
 
 import AppLauncherCard from '../components/AppLauncherCard.vue';
+import ClusterActions from '../components/ClusterActions.vue';
 
 export default {
   components: {
     Loading,
     AppLauncherCard,
+    ClusterActions,
     SortableTable,
     ButtonDropDown
   },
@@ -351,7 +352,17 @@ export default {
 <template>
   <Loading v-if="loading" :label="$store.getters['i18n/t']('appLauncher.loading')" />
   <div v-else class="main-container">
-    <div class="cluster-actions">
+    <ClusterActions
+      :search-query="searchQuery"
+      :is-grid-view="selectedView === 'grid'"
+      :selected-cluster="selectedCluster"
+      :cluster-options="clusterOptions"
+      @update:search-query="searchQuery = $event"
+      @toggle-sort="toggleSortOrder"
+      @update:selected-cluster="selectedCluster = $event"
+      @set-view="selectedView = $event"
+    />
+    <!-- <div class="cluster-actions">
       <div class="search-input">
         <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
       </div>
@@ -371,7 +382,7 @@ export default {
       <button class="icon-button" @click="selectedView = 'list'">
         <i class="icon icon-list-flat" />
       </button>
-    </div>
+    </div> -->
     <div v-if="favoritedApps.length > 0">
       <div class="cluster-header">
         <h2>{{ t('appLauncher.globalApps') }}</h2>
