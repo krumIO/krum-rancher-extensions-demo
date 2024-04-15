@@ -210,6 +210,9 @@ export default {
     },
   },
   computed: {
+    aToZorZtoA() {
+      return this.tableHeaders[0].sortOrder === 'asc' ? 'A-Z' : 'Z-A';
+    },
     displayedClusterData() {
       if (this.selectedCluster === 'ALL_CLUSTERS') {
         const allClustersData = this.servicesByCluster.map(cluster => ({
@@ -279,6 +282,7 @@ export default {
       :is-grid-view="selectedView === 'grid'"
       :selected-cluster="selectedCluster"
       :cluster-options="clusterOptions"
+      :sort-order="tableHeaders[0].sortOrder"
       @update:search-query="updateSearchQuery"
       @toggle-sort="toggleSortOrder"
       @update:selected-cluster="selectedCluster = $event"
@@ -349,5 +353,13 @@ export default {
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+.favorite-icon {
+  margin-right: 1rem;
+}
+
+.icon-button:hover {
+  color: var(--primary-hover);
 }
 </style>
