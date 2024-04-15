@@ -216,6 +216,9 @@ export default {
     },
   },
   computed: {
+    aToZorZtoA() {
+      return this.tableHeaders[0].sortOrder === 'asc' ? 'A-Z' : 'Z-A';
+    },
     selectedClusterData() {
       const cluster = this.getCluster(this.selectedCluster);
       if (cluster) {
@@ -338,14 +341,16 @@ export default {
         <input v-model="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" />
       </div>
       <div class="sort-buttons" v-if="selectedView === 'grid'">
-        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'asc' }" :disabled="this.tableHeaders[0].sortOrder === 'asc'" @click="toggleSortOrder()">
-          <i class="icon-chevron-up"></i>
-        </div>
-        <div class="sort-label">
-          <p>A-Z</p>
-        </div>
-        <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'desc' }" :disabled="this.tableHeaders[0].sortOrder === 'desc'" @click="toggleSortOrder()">
-          <i class="icon-chevron-down"></i>
+        <div @click="toggleSortOrder()">
+          <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'asc' }" :disabled="this.tableHeaders[0].sortOrder === 'asc'">
+            <i class="icon-chevron-up"></i>
+          </div>
+          <div class="sort-label">
+            <p>{{aToZorZtoA}}</p>
+          </div>
+          <div class="sort-button" :class="{ active: this.tableHeaders[0].sortOrder === 'desc' }" :disabled="this.tableHeaders[0].sortOrder === 'desc'">
+            <i class="icon-chevron-down"></i>
+          </div>
         </div>
       </div>
       <div class="select-wrapper">
@@ -508,6 +513,7 @@ export default {
 .sort-label {
   color: var(--primary);
   font-size: 1rem;
+  cursor: pointer;
 }
 
 .sort-buttons {
