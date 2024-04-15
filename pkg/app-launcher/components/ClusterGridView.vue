@@ -7,8 +7,8 @@ export default {
         AppLauncherCard,
     },
     props: {
-        displayedClusterData: {
-            type: Array,
+        clusterData: {
+            type: Object,
             required: true,
         },
         favoritedApps: {
@@ -22,22 +22,18 @@ export default {
 
 <template>
     <div class="cluster-grid-view">
-        <div v-for="clusterData in displayedClusterData" :key="clusterData.id">
-            <div class="cluster-header">
-                <h1>
-                    {{ clusterData.name }}
-                </h1>
-            </div>
-            <div class="services-by-cluster-grid">
+        <div class="cluster-header">
+            <h1>
+                {{ clusterData.name }}
+            </h1>
+        </div>
+        <div class="services-by-cluster-grid">
             <AppLauncherCard
                 v-for="app in clusterData.filteredApps"
                 :key="`${app.clusterId}-${app.id}-${app.kind}`"
-                :app="app"
-                :isInGlobalView="false"
-                :favorited-apps="favoritedApps"
+                :app="app" :isInGlobalView="false" :favorited-apps="favoritedApps"
                 @toggle-favorite="$emit('toggle-favorite', $event)"
             />
-            </div>
         </div>
     </div>
 </template>

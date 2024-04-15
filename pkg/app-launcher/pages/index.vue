@@ -392,11 +392,13 @@ export default {
     </div>
     <div v-if="selectedCluster">
       <div v-if="selectedView === 'grid'">
-        <ClusterGridView
-          :displayed-cluster-data="displayedClusterData"
-          :favorited-apps="favoritedApps"
-          @toggle-favorite="toggleFavorite"
-        />
+        <div v-for="clusterData in displayedClusterData" :key="clusterData.id">
+          <ClusterGridView
+            :cluster-data="clusterData"
+            :favorited-apps="favoritedApps"
+            @toggle-favorite="toggleFavorite"
+          />
+        </div>
       </div>
       <div v-else-if="selectedView === 'list'">
         <div v-for="clusterData in displayedClusterData" :key="clusterData.id">
