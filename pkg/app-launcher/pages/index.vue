@@ -1,9 +1,6 @@
 <script>
 import { MANAGEMENT } from '@shell/config/types';
 import Loading from '@shell/components/Loading';
-import SortableTable from '@shell/components/SortableTable';
-import ButtonDropDown from '@shell/components/ButtonDropdown';
-import { isMaybeSecure } from '@shell/utils/url';
 
 import AppLauncherCard from '../components/AppLauncherCard.vue';
 import ClusterActions from '../components/ClusterActions.vue';
@@ -17,14 +14,11 @@ export default {
     ClusterActions,
     ClusterGridView,
     ClusterListView,
-    SortableTable,
-    ButtonDropDown
   },
   data() {
     return {
       servicesByCluster: [],
       ingressesByCluster: [],
-      clusterLoading: {},
       loading: true,
       selectedCluster: null,
       clusterOptions: [],
@@ -32,35 +26,35 @@ export default {
       favoritedApps: [],
       searchQuery: '',
       tableHeaders: [
-            {
-                name: 'name',
-                label: 'Name',
-                value: 'metadata.name',
-                sort: 'metadata.name',
-                sortOrder: 'asc',
-            },
-            {
-                name: 'namespace',
-                label: 'Namespace',
-                value: 'metadata.namespace',
-            },
-            {
-                name: 'version',
-                label: 'Version',
-                value: 'metadata.labels["app.kubernetes.io/version"]',
-            },
-            {
-                name: 'helmChart',
-                label: 'Helm Chart',
-                value: 'metadata.labels["helm.sh/chart"]',
-            },
-            {
-                name: 'actions',
-                label: 'Actions',
-                value: 'actions',
-                align: 'right',
-            },
-        ],
+        {
+          name: 'name',
+          label: 'Name',
+          value: 'metadata.name',
+          sort: 'metadata.name',
+          sortOrder: 'asc',
+        },
+        {
+          name: 'namespace',
+          label: 'Namespace',
+          value: 'metadata.namespace',
+        },
+        {
+          name: 'version',
+          label: 'Version',
+          value: 'metadata.labels["app.kubernetes.io/version"]',
+        },
+        {
+          name: 'helmChart',
+          label: 'Helm Chart',
+          value: 'metadata.labels["helm.sh/chart"]',
+        },
+        {
+          name: 'actions',
+          label: 'Actions',
+          value: 'actions',
+          align: 'right',
+        },
+      ],
     };
   },
   async mounted() {
@@ -106,17 +100,13 @@ export default {
       console.error('Error fetching clusters', error);
     } finally {
       this.loading = false;
-    };
+    }
   },
   methods: {
     async getClusters() {
       return await this.$store.dispatch(`management/findAll`, {
         type: MANAGEMENT.CLUSTER,
       });
-    },
-    getClusterName(clusterId) {
-      const cluster = this.servicesByCluster.find(c => c.id === clusterId);
-      return cluster ? cluster.name : '';
     },
     getCluster(clusterId) {
       return this.servicesByCluster.find(c => c.id === clusterId) || null;
@@ -196,23 +186,6 @@ export default {
     toggleSortOrder() {
       this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
     },
-    getEndpoints(app) {
-      return (
-        app?.spec.ports?.map((port) => {
-          const endpoint = `${
-            isMaybeSecure(port.port, port.protocol) ? 'https' : 'http'
-          }:${app.metadata.name}:${port.port}`;
-
-          return {
-            label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
-            value: `/k8s/clusters/${this.selectedCluster}/api/v1/namespaces/${app.metadata.namespace}/services/${endpoint}/proxy`,
-          };
-        }) ?? []
-      );
-    },
-    openLink(link) {
-      window.open(link, '_blank');
-    },
     toggleFavorite(item) {
       const index = this.favoritedApps.findIndex(
         (favoritedApp) =>
@@ -232,68 +205,13 @@ export default {
       const favsToStore = JSON.stringify(this.favoritedApps.filter((item) => (item.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true')));
       localStorage.setItem('favoritedApps', favsToStore);
     },
-    isFavorited(app, favoritedApps) {
-      return favoritedApps.some(
-        (favoritedService) =>
-          favoritedService.id === app.id &&
-          favoritedService.kind === app.kind
-      );
-    },
     updateSearchQuery(value) {
       this.searchQuery = value;
     },
-    updateSelectedCluster(value) {
-      this.selectedCluster = value;
-    },
-    updateSelectedView(value) {
-      this.selectedView = value;
-    },
   },
   computed: {
-    selectedClusterData() {
-      const cluster = this.getCluster(this.selectedCluster);
-      if (cluster) {
-        let ingresses = this.ingressesByCluster.find(
-          (ingressCluster) => ingressCluster.id === cluster.id
-        )?.ingresses || [];
-        ingresses = ingresses.map((ingress) => ({
-          ...ingress,
-          clusterId: cluster.id,
-          clusterName: cluster.name,
-        }));
-
-        const services = cluster.services.map((service) => {
-          const relatedIngress = ingresses.find((ingress) =>
-            ingress.spec.rules.some((rule) =>
-              rule.http.paths.some((path) =>
-                path.backend.service?.name === service.metadata.name
-              )
-            )
-          );
-          return {
-            ...service,
-            clusterId: cluster.id,
-            clusterName: cluster.name,
-            relatedIngress,
-          };
-        });
-        
-        const filteredApps = this.filteredApps(services, ingresses);
-
-        return {
-          ...cluster,
-          services,
-          ingresses,
-          filteredApps,
-        };
-      } else {
-        console.error('Cluster not found:', this.selectedCluster);
-      }
-      return null;
-    },
     displayedClusterData() {
       if (this.selectedCluster === 'ALL_CLUSTERS') {
-        
         const allClustersData = this.servicesByCluster.map(cluster => ({
           ...cluster,
           ingresses: this.ingressesByCluster.find(ingressCluster => ingressCluster.id === cluster.id)?.ingresses || [],
@@ -301,40 +219,30 @@ export default {
         }));
         return allClustersData;
       } else {
-        return [this.selectedClusterData]; // This just remakes use of selectedClusterData for single cluster view
-      }
-    },
-    sortedApps() {
-      if (this.selectedClusterData) {
-        const services = this.selectedClusterData.services.map((service) => ({
-          ...service,
-          clusterId: this.selectedClusterData.id,
-          clusterName: this.selectedClusterData.name,
-          uniqueId: `service-${service.id}`,
-        }));
+        const cluster = this.getCluster(this.selectedCluster);
+        if (cluster) {
+          const ingresses = this.ingressesByCluster.find(
+            (ingressCluster) => ingressCluster.id === cluster.id
+          )?.ingresses || [];
 
-        const ingresses = this.selectedClusterData.ingresses.map((ingress) => ({
-          ...ingress,
-          clusterId: this.selectedClusterData.id,
-          clusterName: this.selectedClusterData.name,
-          uniqueId: `ingress-${ingress.id}`,
-        }));
+          const services = cluster.services;
+          
+          const filteredApps = this.filteredApps(services, ingresses);
 
-        return [...services, ...ingresses].sort((a, b) => {
-          const nameA = a.metadata.name.toLowerCase();
-          const nameB = b.metadata.name.toLowerCase();
-          if (this.tableHeaders[0].sortOrder === 'asc') {
-            return nameA.localeCompare(nameB);
-          } else {
-            return nameB.localeCompare(nameA);
-          }
-        });
+          return [{
+            ...cluster,
+            ingresses,
+            filteredApps,
+          }];
+        } else {
+          console.error('Cluster not found:', this.selectedCluster);
+        }
       }
       return [];
     },
     filteredApps() {
       return (services, ingresses) => {
-        const sortedApps = [...(services || []), ...(ingresses || {})].sort((a, b) => {
+        const sortedApps = [...(services || []), ...(ingresses || [])].sort((a, b) => {
           const nameA = a.metadata.name.toLowerCase();
           const nameB = b.metadata.name.toLowerCase();
           if (this.tableHeaders[0].sortOrder === 'asc') {
@@ -441,9 +349,5 @@ export default {
   position: sticky;
   top: 0;
   z-index: 1;
-}
-
-.favorite-icon {
-  margin-right: 1rem;
 }
 </style>
