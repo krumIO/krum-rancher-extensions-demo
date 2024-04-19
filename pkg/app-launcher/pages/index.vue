@@ -243,6 +243,17 @@ export default {
       }
       return [];
     },
+    sortedFavoritedApps() {
+      return this.favoritedApps.sort((a, b) => {
+        const nameA = a.metadata.name.toLowerCase();
+        const nameB = b.metadata.name.toLowerCase();
+        if (this.tableHeaders[0].sortOrder === 'asc') {
+          return nameA.localeCompare(nameB);
+        } else {
+          return nameB.localeCompare(nameA);
+        }
+      });
+    },
     filteredApps() {
       return (services, ingresses) => {
         const sortedApps = [...(services || []), ...(ingresses || [])].sort((a, b) => {
@@ -293,7 +304,8 @@ export default {
         <h2>{{ t('appLauncher.globalApps') }}</h2>
       </div>
       <div class="services-by-cluster-grid">
-        <AppLauncherCard v-for="favoritedApp in favoritedApps"
+        <AppLauncherCard
+          v-for="favoritedApp in sortedFavoritedApps"
           :key="`${favoritedApp.clusterId}-${favoritedApp.id}-${favoritedApp.kind}-fav`"
           :app="favoritedApp"
           :isInGlobalView="true"
