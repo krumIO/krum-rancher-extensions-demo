@@ -3,17 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": "16.19.1"
+    "node": ">=12"
   },
   "dependencies": {
-    "@rancher/components": "0.1.3",
-    "core-js": "3.21.1"
+    "@rancher/components": "0.2.1-alpha.0",
+    "@rancher/shell": "0.5.2",
+    "@types/lodash": "4.14.184",
+    "core-js": "3.21.1",
+    "css-loader": "4.3.0"
   },
   "packageManager": "yarn@3.6.1",
-  "resolutions": {
-    "@types/node": "^16",
-    "webpack": "4"
-  },
   "scripts": {
     "dev": "NODE_ENV=dev ./node_modules/.bin/vue-cli-service serve",
     "build": "./node_modules/.bin/vue-cli-service build",
@@ -24,9 +23,8 @@
     "parse-tag-name": "./node_modules/@rancher/shell/scripts/extension/parse-tag-name"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@rancher/shell": "^0.3.17",
-    "@types/lodash": "4.14.184",
-    "css-loader": "6.7.3"
+    "@types/node": "18.11.9",
+    "@types/semver": "^7.5.8",
+    "semver": "^7.6.0"
   }
 }
