@@ -482,9 +482,9 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-05-10T18:29:48.858062113Z"
+    created: "2024-05-10T18:36:04.370881425Z"
     description: Extension server
-    digest: e461e7ad34892e939a1b03e49f11f431dd145dde4d94012c7523e7de20c589ba
+    digest: e0ee60c6b1a2896a5778be1113f7e650d00868d7986b6b84b446ad1915429ad6
     home: https://rancher.com
     icon: https://docs.ranchermanager.rancher.io/img/rancher-logo-horiz-color.svg
     keywords:
@@ -507,9 +507,9 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.2
-    created: "2024-05-10T18:29:48.85829565Z"
+    created: "2024-05-10T18:36:04.371114331Z"
     description: pirate-locale plugin
-    digest: 62a1645c5a1815f5c3969acdd38cd86c354891af8e01182a8201dd5233deaef5
+    digest: 056ff13aecf14588ad94992730e11d3beca9343b58ba77b880d780a34d904b16
     name: pirate-locale
     type: application
     urls:
@@ -534,4 +534,4 @@ entries:
     urls:
     - assets/pirate-locale/pirate-locale-0.1.1.tgz
     version: 0.1.1
-generated: "2024-05-10T18:29:48.857660772Z"
+generated: "2024-05-10T18:36:04.370512552Z"
