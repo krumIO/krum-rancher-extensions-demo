@@ -8,6 +8,28 @@ entries:
       catalog.cattle.io/namespace: cattle-ui-plugin-system
       catalog.cattle.io/os: linux
       catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= 2.8.0-0'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
+      catalog.cattle.io/ui-version: '>= 2.7.2'
+    apiVersion: v2
+    appVersion: 0.1.30
+    created: "2024-05-10T18:59:50.638594433Z"
+    description: App Launcher extension for Rancher
+    digest: e95f9fc721498631a5198c0459a6e403bf4ff5e36e2b5a99272d8722c0d73b6e
+    icon: https://raw.githubusercontent.com/krumIO/krum-rancher-extensions/main/pkg/app-launcher/icon.svg
+    name: app-launcher
+    type: application
+    urls:
+    - assets/app-launcher/app-launcher-0.1.30.tgz
+    version: 0.1.30
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/display-name: 'Krum Platform Tools: App Launcher'
+      catalog.cattle.io/kube-version: '>= v1.16.0-0 < v1.29.0-0'
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
       catalog.cattle.io/rancher-version: '>= v2.7.9'
       catalog.cattle.io/scope: management
       catalog.cattle.io/ui-component: plugins
@@ -509,4 +531,4 @@ entries:
     urls:
     - assets/pirate-locale/pirate-locale-0.1.1.tgz
     version: 0.1.1
-generated: "2024-05-10T14:58:18.497323479Z"
+generated: "2024-05-10T18:59:50.637523917Z"
