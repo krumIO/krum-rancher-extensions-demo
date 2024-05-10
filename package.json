@@ -12,7 +12,6 @@
     "core-js": "3.21.1",
     "css-loader": "4.3.0"
   },
-  "packageManager": "yarn@3.6.1",
   "scripts": {
     "dev": "NODE_ENV=dev ./node_modules/.bin/vue-cli-service serve",
     "build": "./node_modules/.bin/vue-cli-service build",
