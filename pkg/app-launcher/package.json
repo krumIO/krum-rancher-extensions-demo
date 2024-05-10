@@ -1,6 +1,6 @@
 {
   "name": "app-launcher",
-  "description": "App Launcher plugin for Rancher",
+  "description": "App Launcher extension for Rancher",
   "version": "0.1.29",
   "private": false,
   "rancher": {
