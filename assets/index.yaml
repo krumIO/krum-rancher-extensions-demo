@@ -13,9 +13,9 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.28
-    created: "2024-05-10T14:57:41.627084421Z"
+    created: "2024-05-10T18:26:52.645499408Z"
     description: App Launcher plugin for Rancher
-    digest: 6854c790d87d5b82ee23842e78ea4a816395bf312cd29ca6af490122b7a63798
+    digest: da936cc3cb471666ec7758befcb03c259b8dbdc08bc0c1a8cf634276ea29a4c3
     icon: https://raw.githubusercontent.com/krumIO/krum-rancher-extensions/main/pkg/app-launcher/icon.svg
     name: app-launcher
     type: application
@@ -473,18 +473,18 @@ entries:
   pirate-locale:
   - annotations:
       catalog.cattle.io/certified: rancher
-      catalog.cattle.io/kube-version: '>= 1.16.0-0 < 1.28.0-0'
+      catalog.cattle.io/kube-version: '>= 1.16.0-0 < 1.29.0-0'
       catalog.cattle.io/namespace: cattle-ui-plugin-system
       catalog.cattle.io/os: linux
       catalog.cattle.io/permits-os: linux, windows
-      catalog.cattle.io/rancher-version: '>= 2.7.0-0 < 2.8.0-0'
+      catalog.cattle.io/rancher-version: '>= 2.7.0-0 < 2.9.0-0'
       catalog.cattle.io/scope: management
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.1.2
-    created: "2024-05-10T14:57:41.627359995Z"
+    created: "2024-05-10T18:26:52.645718696Z"
     description: pirate-locale plugin
-    digest: 7689f838a5770f27c906a48fcf1bcadda353bc6c1c90ba34d5722c824c53e0f8
+    digest: 889ff3469c9d66c336f37861af615c4df0dc7ce8d4c4028a119cc0959505427f
     name: pirate-locale
     type: application
     urls:
@@ -509,4 +509,4 @@ entries:
     urls:
     - assets/pirate-locale/pirate-locale-0.1.1.tgz
     version: 0.1.1
-generated: "2024-05-10T14:57:41.626431751Z"
+generated: "2024-05-10T18:26:52.645005278Z"
