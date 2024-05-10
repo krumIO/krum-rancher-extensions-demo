@@ -1,13 +1,14 @@
 {
   "name": "app-launcher",
   "description": "App Launcher plugin for Rancher",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "private": false,
   "rancher": {
     "annotations": {
-      "catalog.cattle.io/rancher-version": ">= v2.7.9",
+      "catalog.cattle.io/rancher-version": ">= 2.8.0-0",
       "catalog.cattle.io/kube-version": ">= v1.16.0-0 < v1.29.0-0",
       "catalog.cattle.io/display-name": "Krum Platform Tools: App Launcher"
+      "catalog.cattle.io/ui-version": ">= 2.7.2"
     }
   },
   "icon": "https://raw.githubusercontent.com/krumIO/krum-rancher-extensions/main/pkg/app-launcher/icon.svg",
