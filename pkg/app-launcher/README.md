@@ -14,15 +14,27 @@ The extension intends to improve the discoverability of services and offer a str
 - Grid and list views for easy navigation
 - Multi-cluster support for viewing services across different clusters
 
-## How to Run
-
-1. Clone this repository to your machine.
-2. Install the npm dependencies using the command `yarn install`.
-3. Run the extension locally with the command `API=<Rancher Backend URL> yarn dev`.
-
 ## Usage
 
-### Tag "Global" Apps
+### Filter by Name
+
+- Use the Filter box in the toolbar to search through all of the objects that your user credentials have access to across clusters.
+
+### Filter by Cluster
+
+- This page showcases cards for each discovered service and ingress, allowing you to conveniently open the service with a simple click.
+    *The extension is designed to improve discoverability and offer a straightforward way to navigate the complexities of multi-cluster environments.*
+
+### Change views
+
+- The view can be changed with the view buttons in the toolbar, to switch between grid view and list view.
+
+### Select favorites (user)
+
+- Star service or ingress objects to surface them to the Global Apps section for easier discovery on repeat visits.
+- Note: This is currently limited 
+
+### Tag "Global" Apps (admin)
 
 Global apps will show at the top of the App Launcher page as a combination of global apps defined by cluster YAML files and user-selected favorites.
 
@@ -37,15 +49,15 @@ metadata:
     extensions.applauncher/global-app: "true"
 ```
 
-### Filter by Name
+## Installation
 
+Please follow the instructions for installing the extension collection at the repository root: https://github.com/krumIO/krum-rancher-extensions/
 
+## Development
 
-### Filter by Cluster
-
-- This page showcases cards for each discovered service and ingress, allowing you to conveniently open the service with a simple click.
-    *The extension is designed to improve discoverability and offer a straightforward way to navigate the complexities of multi-cluster environments.*
-- The view can be changed with the view buttons from grid to list views.
+1. Clone this repository to your machine.
+2. Install the npm dependencies using the command `yarn install`.
+3. Run the extension collection locally with the command `API=<Rancher Backend URL> yarn dev`.
 
 ## Contribution
 
