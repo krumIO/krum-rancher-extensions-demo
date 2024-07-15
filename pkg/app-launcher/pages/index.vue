@@ -342,7 +342,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "@shell/assets/styles/fonts/_icons.scss";
 
 .main-container {
   margin-top: -2.425rem;
