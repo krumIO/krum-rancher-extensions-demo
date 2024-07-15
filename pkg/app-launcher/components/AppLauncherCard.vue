@@ -149,7 +149,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "@shell/assets/styles/fonts/_icons.scss";
 
 .app-launcher-card {
   ::v-deep .card-body {
