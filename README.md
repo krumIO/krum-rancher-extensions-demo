@@ -110,4 +110,4 @@ If so, make sure you are using node 16. Those with NVM can use the following com
 
 ## Misc
 
-For more info, refer to the [rancher extensions prerequisites](https://rancher.github.io/dashboard/extensions/extensions-getting-started#prerequisites).
+For more info, refer to the [rancher extensions prerequisites](https://extensions.rancher.io/extensions/next/extensions-getting-started#prerequisites).
