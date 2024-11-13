@@ -13,6 +13,7 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
+		'no-tabs': ['error', { allowIndentationTabs: true }],
     'dot-notation': 'off',
     'generator-star-spacing': 'off',
     'guard-for-in': 'off',
