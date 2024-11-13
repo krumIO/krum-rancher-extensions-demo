@@ -2,32 +2,31 @@
 export default {
     name: 'ClusterActions',
     props: {
-        searchQuery: {
-            type: String,
-            required: true,
-        },
-        isGridView: {
-            type: Boolean,
-            required: true,
-        },
-        sortOrder: {
-            type: String,
-            required: true,
-        },
-        selectedCluster: {
-            type: String,
-            required: true,
-        },
-        clusterOptions: {
-            type: Array,
-            required: true,
-        },
+			searchQuery: {
+				type: String,
+				required: true,
+			},
+			isGridView: {
+				type: Boolean,
+				required: true,
+			},
+			sortOrder: {
+				type: String,
+				required: true,
+			},
+			selectedCluster: {
+				type: String,
+				required: true,
+			},
+			clusterOptions: {
+				type: Array,
+				required: true,
+			},
     },
     computed: {
-        aToZorZtoA() {
-            console.log(this.$store.getters['i18n/t']('appLauncher.aToZ'));
-            return this.sortOrder === 'asc' ? this.$store.getters['i18n/t']('appLauncher.aToZ') : this.$store.getters['i18n/t']('appLauncher.zToA');
-        },
+			aToZorZtoA() {
+				return this.sortOrder === 'asc' ? this.$store.getters['i18n/t']('appLauncher.aToZ') : this.$store.getters['i18n/t']('appLauncher.zToA');
+			},
     },
     emits: ['update:search-query', 'toggle-sort', 'update:selected-cluster', 'set-view'],
 };
@@ -78,7 +77,6 @@ export default {
     padding-bottom: 0.425rem;
     padding-right: 4.4rem;
     background: inherit;
-    border-bottom: var(--header-border-size) solid var(--header-border);
 }
 
 .icon-button {
