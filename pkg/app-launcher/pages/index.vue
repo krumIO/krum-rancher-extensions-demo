@@ -60,9 +60,10 @@ export default {
   async mounted() {
     try {
       const allClusters = await this.getClusters();
+
       this.servicesByCluster = await this.getServicesByCluster(allClusters);
       this.ingressesByCluster = await this.getIngressesByCluster(allClusters);
-      this.selectedCluster = "ALL_CLUSTERS";
+      this.selectedCluster = 'ALL_CLUSTERS';
       this.generateClusterOptions();
 
       // Retrieve global services based on annotations
@@ -93,6 +94,7 @@ export default {
 
       // Retrieve favorites from localStorage
       const storedFavorites = localStorage.getItem('favoritedApps');
+
       if (storedFavorites) {
         this.favoritedApps.push(...JSON.parse(storedFavorites));
       }
@@ -123,12 +125,14 @@ export default {
               loading: true,
               error: false,
             };
+
             try {
               const services = (
                 await this.$store.dispatch('cluster/request', {
                   url: `/k8s/clusters/${cluster.id}/v1/services`,
                 })
               ).data;
+
               clusterData.services = services.map((service) => ({
                 ...service,
                 clusterId: cluster.id,
@@ -140,12 +144,13 @@ export default {
             } finally {
               clusterData.loading = false;
             }
+
             return clusterData;
           })
       );
     },
     async getIngressesByCluster(allClusters) {
-      return Promise.all(
+      return await Promise.all(
         allClusters
           .filter((cluster) => cluster.isReady)
           .map(async (cluster) => {
@@ -156,12 +161,14 @@ export default {
               loading: true,
               error: false,
             };
+
             try {
               const ingresses = (
                 await this.$store.dispatch('cluster/request', {
                   url: `/k8s/clusters/${cluster.id}/v1/networking.k8s.io.ingresses`,
                 })
               ).data;
+
               clusterData.ingresses = ingresses.map((ingress) => ({
                 ...ingress,
                 clusterId: cluster.id,
@@ -173,27 +180,33 @@ export default {
             } finally {
               clusterData.loading = false;
             }
+
             return clusterData;
           })
       );
     },
     generateClusterOptions() {
-      this.clusterOptions = [{ label: 'All Clusters', value: 'ALL_CLUSTERS' }, ...this.servicesByCluster.map(cluster => ({
-        label: cluster.name,
-        value: cluster.id,
-      }))];
+      this.clusterOptions = [
+				{
+					label: 'All Clusters',
+					value: 'ALL_CLUSTERS'
+				},
+				...this.servicesByCluster.map(cluster => ({
+					label: cluster.name,
+					value: cluster.id,
+				}))
+			];
     },
     toggleSortOrder() {
       this.tableHeaders[0].sortOrder = this.tableHeaders[0].sortOrder === 'asc' ? 'desc' : 'asc';
     },
     toggleFavorite(item) {
       const index = this.favoritedApps.findIndex(
-        (favoritedApp) =>
-          favoritedApp.id === item.id &&
+        (favoritedApp) => favoritedApp.id === item.id &&
           favoritedApp.kind === item.kind
       );
-      
-      if (index !== -1) {
+
+			if (index !== -1) {
         this.favoritedApps.splice(index, 1);
       } else {
         this.favoritedApps.push({
@@ -202,7 +215,12 @@ export default {
       }
 
       // Store updated favorites in localStorage
-      const favsToStore = JSON.stringify(this.favoritedApps.filter((item) => (item.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true')));
+      const favsToStore = JSON.stringify(
+				this.favoritedApps.filter((item) => (
+					item.metadata.annotations?.['extensions.applauncher/global-app'] !== 'true'
+				))
+			);
+
       localStorage.setItem('favoritedApps', favsToStore);
     },
     updateSearchQuery(value) {
@@ -217,19 +235,25 @@ export default {
       if (this.selectedCluster === 'ALL_CLUSTERS') {
         const allClustersData = this.servicesByCluster.map(cluster => ({
           ...cluster,
-          ingresses: this.ingressesByCluster.find(ingressCluster => ingressCluster.id === cluster.id)?.ingresses || [],
-          filteredApps: this.filteredApps(cluster.services, this.ingressesByCluster.find(ingressCluster => ingressCluster.id === cluster.id)?.ingresses || []),
+          ingresses: this.ingressesByCluster.find(
+						ingressCluster => ingressCluster.id === cluster.id
+					)?.ingresses || [],
+          filteredApps: this.filteredApps(cluster.services,
+					this.ingressesByCluster.find(
+						ingressCluster => ingressCluster.id === cluster.id
+					)?.ingresses || []),
         }));
+
         return allClustersData;
       } else {
         const cluster = this.getCluster(this.selectedCluster);
+
         if (cluster) {
           const ingresses = this.ingressesByCluster.find(
             (ingressCluster) => ingressCluster.id === cluster.id
           )?.ingresses || [];
 
           const services = cluster.services;
-          
           const filteredApps = this.filteredApps(services, ingresses);
 
           return [{
@@ -241,12 +265,17 @@ export default {
           console.error('Cluster not found:', this.selectedCluster);
         }
       }
+
       return [];
     },
     sortedFavoritedApps() {
-      return this.favoritedApps.sort((a, b) => {
+			// create const, dont edit computed values
+			const favoritedApps = this.favoritedApps;
+
+      return favoritedApps.sort((a, b) => {
         const nameA = a.metadata.name.toLowerCase();
         const nameB = b.metadata.name.toLowerCase();
+
         if (this.tableHeaders[0].sortOrder === 'asc') {
           return nameA.localeCompare(nameB);
         } else {
@@ -259,6 +288,7 @@ export default {
         const sortedApps = [...(services || []), ...(ingresses || [])].sort((a, b) => {
           const nameA = a.metadata.name.toLowerCase();
           const nameB = b.metadata.name.toLowerCase();
+
           if (this.tableHeaders[0].sortOrder === 'asc') {
             return nameA.localeCompare(nameB);
           } else {
@@ -270,6 +300,7 @@ export default {
           return sortedApps;
         } else {
           const searchTerm = this.searchQuery.trim().toLowerCase();
+
           return sortedApps.filter(app => {
             return (app.metadata.name.toLowerCase().includes(searchTerm) ||
               app.metadata.namespace.toLowerCase().includes(searchTerm) ||
@@ -308,7 +339,7 @@ export default {
           v-for="favoritedApp in sortedFavoritedApps"
           :key="`${favoritedApp.clusterId}-${favoritedApp.id}-${favoritedApp.kind}-fav`"
           :app="favoritedApp"
-          :isInGlobalView="true"
+          :is-in-global-view="true"
           :favorited-apps="favoritedApps"
           @toggle-favorite="toggleFavorite"
         />

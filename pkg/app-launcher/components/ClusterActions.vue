@@ -25,7 +25,9 @@ export default {
     },
     computed: {
 			aToZorZtoA() {
-				return this.sortOrder === 'asc' ? this.$store.getters['i18n/t']('appLauncher.aToZ') : this.$store.getters['i18n/t']('appLauncher.zToA');
+				return this.sortOrder === 'asc'
+					? this.$store.getters['i18n/t']('appLauncher.aToZ')
+					: this.$store.getters['i18n/t']('appLauncher.zToA');
 			},
     },
     emits: ['update:search-query', 'toggle-sort', 'update:selected-cluster', 'set-view'],
@@ -33,37 +35,60 @@ export default {
 </script>
 
 <template>
-    <div class="cluster-actions">
-        <div class="search-input">
-            <input :value="searchQuery" :placeholder="$store.getters['i18n/t']('appLauncher.filter')" @input="$emit('update:search-query', $event.target.value)" />
-        </div>
-        <div class="sort-buttons" v-if="isGridView" @click="$emit('toggle-sort')">
-            <div class="sort-button" :class="{ active: sortOrder === 'asc' }" :disabled="sortOrder === 'asc'">
-                <i class="icon-chevron-up"></i>
-            </div>
-            <div class="sort-label">
-                <p>{{ aToZorZtoA }}</p>
-            </div>
-            <div class="sort-button" :class="{ active: sortOrder === 'desc' }" :disabled="sortOrder === 'desc'">
-                <i class="icon-chevron-down"></i>
-            </div>
-        </div>
-        <div class="select-wrapper">
-            <select :value="selectedCluster" class="cluster-select" @change="$emit('update:selected-cluster', $event.target.value)">
-                <option v-for="option in clusterOptions" :key="option.value" :value="option.value">
-                    {{ option.label }}
-                </option>
-            </select>
-        </div>
-        <button class="icon-button" @click="$emit('set-view', 'grid')">
-            <i class="icon icon-apps" />
-        </button>
-        <button class="icon-button" @click="$emit('set-view', 'list')">
-            <i class="icon icon-list-flat" />
-        </button>
-    </div>
+	<div class="cluster-actions">
+		<div class="search-input">
+			<input
+				:value="searchQuery"
+				:placeholder="$store.getters['i18n/t']('appLauncher.filter')"
+				@input="$emit('update:search-query', $event.target.value)"
+			/>
+		</div>
+		<div
+			v-if="isGridView"
+			class="sort-buttons"
+			@click="$emit('toggle-sort')"
+		>
+			<div
+				class="sort-button"
+				:class="{ active: sortOrder === 'asc' }"
+				:disabled="sortOrder === 'asc'"
+			>
+				<i class="icon-chevron-up"></i>
+			</div>
+			<div class="sort-label">
+				<p>{{ aToZorZtoA }}</p>
+			</div>
+			<div
+				class="sort-button"
+				:class="{ active: sortOrder === 'desc' }"
+				:disabled="sortOrder === 'desc'"
+			>
+				<i class="icon-chevron-down"></i>
+			</div>
+		</div>
+		<div class="select-wrapper">
+			<select
+				:value="selectedCluster"
+				class="cluster-select"
+				@change="$emit('update:selected-cluster', $event.target.value)"
+			>
+				<option
+					v-for="option in clusterOptions"
+					:key="option.value"
+					:value="option.value"
+				>
+					{{ option.label }}
+				</option>
+			</select>
+		</div>
+		<button class="icon-button" @click="$emit('set-view', 'grid')">
+			<i class="icon icon-apps" />
+		</button>
+		<button class="icon-button" @click="$emit('set-view', 'list')">
+			<i class="icon icon-list-flat" />
+		</button>
+	</div>
 </template>
-
 
 <style scoped>
 .cluster-actions {

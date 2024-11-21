@@ -3,8 +3,8 @@ import { PRODUCT_NAME, BLANK_CLUSTER } from '../config/app-launcher';
 
 const routes = [
   {
-    name:      `${ PRODUCT_NAME }-c-cluster`,
-    path:      `/${ PRODUCT_NAME }/c/:cluster`,
+    name:      `${PRODUCT_NAME}-c-cluster`,
+    path:      `/${PRODUCT_NAME}/c/:cluster`,
     component: Dashboard,
     meta:      {
       product: PRODUCT_NAME,
