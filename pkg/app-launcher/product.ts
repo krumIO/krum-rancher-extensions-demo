@@ -12,8 +12,8 @@ export function init($plugin: IPlugin, store: any) {
     inStore: 'management',
     weight: 100,
     to: {
-      name: `${ PRODUCT_NAME }-c-cluster`,
-      path: `/${ PRODUCT_NAME }/c/:cluster/dashboard`,
+      name: `${PRODUCT_NAME}-c-cluster`,
+      path: `/${PRODUCT_NAME}/c/:cluster/dashboard`,
       params: {
         product: PRODUCT_NAME,
         cluster: BLANK_CLUSTER,

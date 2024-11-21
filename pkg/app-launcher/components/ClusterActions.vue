@@ -25,9 +25,7 @@ export default {
     },
     computed: {
 			aToZorZtoA() {
-				return this.sortOrder === 'asc'
-					? this.$store.getters['i18n/t']('appLauncher.aToZ')
-					: this.$store.getters['i18n/t']('appLauncher.zToA');
+				return this.sortOrder === 'asc' ? this.$store.getters['i18n/t']('appLauncher.aToZ') : this.$store.getters['i18n/t']('appLauncher.zToA');
 			},
     },
     emits: ['update:search-query', 'toggle-sort', 'update:selected-cluster', 'set-view'],
