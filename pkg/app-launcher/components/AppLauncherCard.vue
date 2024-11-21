@@ -42,7 +42,7 @@ export default {
           return {
             label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
             value: `/k8s/clusters/${this.app.clusterId}/api/v1/namespaces/` +
-							`${this.app.metadata.namespace}/services/${endpoint}/proxy`,
+              `${this.app.metadata.namespace}/services/${endpoint}/proxy`,
           };
         }) ?? []
       );
@@ -86,36 +86,36 @@ export default {
 
 <template>
   <Card
-		v-if="app"
-		class="app-launcher-card"
-		:show-highlight-border="false"
-		:sticky="true"
-	>
+    v-if="app"
+    class="app-launcher-card"
+    :show-highlight-border="false"
+    :sticky="true"
+  >
     <template #title>
       <div style="width: 100%">
         <p style="font-size: 1.2rem">
           {{ app.metadata?.name }}
         </p>
         <div
-					style="
-						color: var(--input-label); display: flex;
-						justify-content: space-between; margin-top: 4px;
-					"
-				>
+          style="
+            color: var(--input-label); display: flex;
+            justify-content: space-between; margin-top: 4px;
+          "
+        >
           <p
-						v-if="
-							app.kind === 'Service' &&
-							app.metadata?.labels?.['app.kubernetes.io/version'] !== undefined
-						"
-					>
+            v-if="
+              app.kind === 'Service' &&
+              app.metadata?.labels?.['app.kubernetes.io/version'] !== undefined
+            "
+          >
             {{ kubernetesVersion }}
           </p>
           <p
-						v-if="
-							app.kind === 'Service' &&
-							app.metadata?.labels?.['helm.sh/chart'] !== undefined
-						"
-					>
+            v-if="
+              app.kind === 'Service' &&
+              app.metadata?.labels?.['helm.sh/chart'] !== undefined
+            "
+          >
             {{ helmChart }}
           </p>
           <p v-if="app.kind === 'Ingress'">
@@ -127,17 +127,17 @@ export default {
     <template #body>
       <p v-if="app.kind === 'Service'">
         {{
-					(isGlobalApp || isFavorited) &&
-					isInGlobalView ? `${app.clusterName}/` : ''
-				}}
-				{{ namespace }}/{{ name }}
+          (isGlobalApp || isFavorited) &&
+          isInGlobalView ? `${app.clusterName}/` : ''
+        }}
+        {{ namespace }}/{{ name }}
       </p>
       <p v-if="app.kind === 'Ingress'">
         {{
-					(isGlobalApp || isFavorited) &&
-					isInGlobalView ? `${app.clusterName}: ` : ''
-				}}
-				{{ ingressPath }}
+          (isGlobalApp || isFavorited) &&
+          isInGlobalView ? `${app.clusterName}: ` : ''
+        }}
+        {{ ingressPath }}
       </p>
     </template>
     <template #actions>
@@ -152,9 +152,9 @@ export default {
         target="_blank"
         rel="noopener noreferrer nofollow"
         :title="endpoints?.length === 0 ? t('appLauncher.noEndpointFoundForApp')
-								: t('appLauncher.launchEndpoint', {
-									endpoint: endpoints[0].label,
-								})"
+                : t('appLauncher.launchEndpoint', {
+                  endpoint: endpoints[0].label,
+                })"
         class="btn role-primary"
       >
         {{ t('appLauncher.launch') }}
