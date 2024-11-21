@@ -38,6 +38,7 @@ export default {
           const endpoint = `${
             isMaybeSecure(port.port, port.protocol) ? 'https' : 'http'
           }:${this.app.metadata?.name}:${port.port}`;
+
           return {
             label: `${endpoint}${port.protocol === 'UDP' ? ' (UDP)' : ''}`,
             value: `/k8s/clusters/${this.app.clusterId}/api/v1/namespaces/` +
