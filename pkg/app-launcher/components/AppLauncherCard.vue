@@ -181,7 +181,7 @@ export default {
 
 <style lang="scss" scoped>
 .app-launcher-card {
-  ::v-deep .card-body {
+  :deep() .card-body {
     overflow: hidden !important;
   }
 }

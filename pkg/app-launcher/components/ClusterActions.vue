@@ -38,7 +38,7 @@ export default {
       <input
         :value="searchQuery"
         :placeholder="$store.getters['i18n/t']('appLauncher.filter')"
-        @input="$emit('update:search-query', $event.target.value)"
+        @update:value="$emit('update:search-query', $event.target.value)"
       />
     </div>
     <div
