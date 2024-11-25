@@ -2,40 +2,42 @@
 import AppLauncherCard from './AppLauncherCard.vue';
 
 export default {
-    name: 'ClusterGridView',
-    components: {
-        AppLauncherCard,
+  name: 'ClusterGridView',
+  components: {
+    AppLauncherCard,
+  },
+  props: {
+    clusterData: {
+      type: Object,
+      required: true,
     },
-    props: {
-        clusterData: {
-            type: Object,
-            required: true,
-        },
-        favoritedApps: {
-            type: Array,
-            required: true,
-        },
+    favoritedApps: {
+      type: Array,
+      required: true,
     },
-    emits: ['toggle-favorite'],
+  },
+  emits: ['toggle-favorite'],
 };
 </script>
 
 <template>
-    <div class="cluster-grid-view">
-        <div class="cluster-header">
-            <h1>
-                {{ clusterData.name }}
-            </h1>
-        </div>
-        <div class="services-by-cluster-grid">
-            <AppLauncherCard
-                v-for="app in clusterData.filteredApps"
-                :key="`${app.clusterId}-${app.id}-${app.kind}`"
-                :app="app" :isInGlobalView="false" :favorited-apps="favoritedApps"
-                @toggle-favorite="$emit('toggle-favorite', $event)"
-            />
-        </div>
+  <div class="cluster-grid-view">
+    <div class="cluster-header">
+      <h1>
+        {{ clusterData.name }}
+      </h1>
     </div>
+    <div class="services-by-cluster-grid">
+      <AppLauncherCard
+        v-for="app in clusterData.filteredApps"
+        :key="`${app.clusterId}-${app.id}-${app.kind}`"
+        :app="app"
+        :is-in-global-view="false"
+        :favorited-apps="favoritedApps"
+        @toggle-favorite="$emit('toggle-favorite', $event)"
+      />
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
