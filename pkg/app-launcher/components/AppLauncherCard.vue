@@ -147,10 +147,10 @@ export default {
       <i v-else class="icon icon-globe icon-only" />
       <a
         v-if="(endpoints?.length ?? 0) <= 1 && app.kind === 'Service'"
-        :disabled="!endpoints?.length"
         :href="endpoints[0]?.value"
         target="_blank"
         rel="noopener noreferrer nofollow"
+        :disabled="endpoints?.length > 0 ? null : true"
         :title="endpoints?.length === 0 ? t('appLauncher.noEndpointFoundForApp')
                 : t('appLauncher.launchEndpoint', {
                   endpoint: endpoints[0].label,
