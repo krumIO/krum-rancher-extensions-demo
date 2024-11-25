@@ -147,14 +147,16 @@ export default {
       <i v-else class="icon icon-globe icon-only" />
       <a
         v-if="(endpoints?.length ?? 0) <= 1 && app.kind === 'Service'"
+        v-bind="{disabled: endpoints?.length > 0 ? null : true}"
+        
         :href="endpoints[0]?.value"
-        target="_blank"
-        rel="noopener noreferrer nofollow"
-        :disabled="endpoints?.length > 0 ? null : true"
         :title="endpoints?.length === 0 ? t('appLauncher.noEndpointFoundForApp')
                 : t('appLauncher.launchEndpoint', {
                   endpoint: endpoints[0].label,
                 })"
+        
+        target="_blank"
+        rel="noopener noreferrer nofollow"
         class="btn role-primary"
       >
         {{ t('appLauncher.launch') }}
@@ -162,6 +164,7 @@ export default {
       <a
         v-else-if="app.kind === 'Ingress'"
         :href="ingressPath"
+        
         target="_blank"
         rel="noopener noreferrer nofollow"
         class="btn role-primary"
@@ -170,9 +173,11 @@ export default {
       </a>
       <ButtonDropDown
         v-else
+        
         :button-label="t('appLauncher.launch')"
         :dropdown-options="endpoints"
         :title="t('appLauncher.launchAnEndpointFromSelection')"
+
         @click-action="(o) => openLink(o.value)"
       />
     </template>

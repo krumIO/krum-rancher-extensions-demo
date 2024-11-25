@@ -94,8 +94,14 @@ export default {
           </button>
           <a
             v-if="getEndpoints(row)?.length <= 1 && row.kind === 'Service'"
-            :href="getEndpoints(row)[0]?.value"
             v-bind="{disabled: getEndpoints(row)?.length > 0 ? null : true}"
+            
+            :href="getEndpoints(row)[0]?.value"
+            :title="getEndpoints(row)?.length === 0 ? t('appLauncher.noEndpointFoundForApp')
+                : t('appLauncher.launchEndpoint', {
+                  endpoint: getEndpoints(row)[0].label,
+                })"
+            
             target="_blank"
             rel="noopener noreferrer nofollow"
             class="btn role-primary"
@@ -104,7 +110,9 @@ export default {
           </a>
           <a
             v-else-if="row.kind === 'Ingress'"
+
             :href="ingressPath(row)"
+
             target="_blank"
             rel="noopener noreferrer nofollow"
             class="btn role-primary"
@@ -113,9 +121,11 @@ export default {
           </a>
           <ButtonDropDown
             v-else
+ 
             :button-label="t('appLauncher.launch')"
             :dropdown-options="getEndpoints(row)"
             :title="t('appLauncher.launchAnEndpointFromSelection')"
+
             @click-action="openLink"
           />
         </div>
