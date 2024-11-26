@@ -136,10 +136,22 @@ export default {
 
 <style scoped lang="scss">
 .cluster-list-view {
-    margin-bottom: 2rem;
-    .favorite-icon {
-        margin-right: 1rem;
-        background: none;
-    }
+  margin-bottom: 2rem;
+  .favorite-icon {
+    margin-right: 1rem;
+    background: none;
+  }
+}
+
+.cluster-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--header-bg);
+  height: var(--header-height);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 </style>
